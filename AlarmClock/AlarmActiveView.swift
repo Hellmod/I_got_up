@@ -97,7 +97,10 @@ struct AlarmActiveView: View {
                 .padding(.bottom, 56)
             }
         }
-        .onAppear { soundPlayer.start() }
+        .onAppear {
+            BackgroundAlarmService.shared.stopAlarmSound()
+            soundPlayer.start()
+        }
         .onDisappear { soundPlayer.stop() }
     }
 

@@ -16,6 +16,7 @@
 		B320000700000000DEADBEEF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B310000700000000DEADBEEF /* Assets.xcassets */; };
 		B320000800000000DEADBEEF /* AlarmActiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310001000000000DEADBEEF /* AlarmActiveView.swift */; };
 		B320000900000000DEADBEEF /* AlarmHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310001100000000DEADBEEF /* AlarmHistoryView.swift */; };
+		B320001000000000DEADBEEF /* BackgroundAlarmService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310001200000000DEADBEEF /* BackgroundAlarmService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 		B310000900000000DEADBEEF /* AlarmClock.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AlarmClock.entitlements; sourceTree = "<group>"; };
 		B310001000000000DEADBEEF /* AlarmActiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmActiveView.swift; sourceTree = "<group>"; };
 		B310001100000000DEADBEEF /* AlarmHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmHistoryView.swift; sourceTree = "<group>"; };
+		B310001200000000DEADBEEF /* BackgroundAlarmService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundAlarmService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +65,7 @@
 				B310000700000000DEADBEEF /* Assets.xcassets */,
 				B310001000000000DEADBEEF /* AlarmActiveView.swift */,
 				B310001100000000DEADBEEF /* AlarmHistoryView.swift */,
+				B310001200000000DEADBEEF /* BackgroundAlarmService.swift */,
 				B310000900000000DEADBEEF /* AlarmClock.entitlements */,
 			);
 			path = AlarmClock;
@@ -154,6 +157,7 @@
 				B320000600000000DEADBEEF /* AlarmScheduler.swift in Sources */,
 				B320000800000000DEADBEEF /* AlarmActiveView.swift in Sources */,
 				B320000900000000DEADBEEF /* AlarmHistoryView.swift in Sources */,
+				B320001000000000DEADBEEF /* BackgroundAlarmService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -320,13 +320,14 @@ class NotificationManager: NSObject, ObservableObject, UNUserNotificationCenterD
         switch response.actionIdentifier {
 
         // User tapped notification body (app was in background/killed) — show in-app UI.
+        // Do NOT schedule wake-up check here; that happens only after user taps Dismiss
+        // in AlarmActiveView.dismissAlarm().
         case UNNotificationDefaultActionIdentifier:
             let category = response.notification.request.content.categoryIdentifier
             if category == NotificationCategory.alarm {
                 disableOnceAlarm(alarm, in: AlarmStore())
-                DispatchQueue.main.async { self.firingAlarm = alarm }
                 cancelWakeUpCheck(for: alarmID)
-                scheduleWakeUpCheck(for: alarm)
+                DispatchQueue.main.async { self.firingAlarm = alarm }
             }
 
         case NotificationAction.dismiss:
@@ -334,16 +335,28 @@ class NotificationManager: NSObject, ObservableObject, UNUserNotificationCenterD
             disableOnceAlarm(alarm, in: AlarmStore())
             cancelWakeUpCheck(for: alarmID)
             scheduleWakeUpCheck(for: alarm)
+            BackgroundAlarmService.shared.stopAlarmSound()
+            DispatchQueue.main.async {
+                if self.firingAlarm?.id == alarmID { self.firingAlarm = nil }
+            }
 
         case NotificationAction.snooze5:
             historyStore.record(alarm: alarm, action: .snoozed, detail: "5 min")
             cancelWakeUpCheck(for: alarmID)
             scheduleSnooze(for: alarm, minutes: 5)
+            BackgroundAlarmService.shared.stopAlarmSound()
+            DispatchQueue.main.async {
+                if self.firingAlarm?.id == alarmID { self.firingAlarm = nil }
+            }
 
         case NotificationAction.snooze10:
             historyStore.record(alarm: alarm, action: .snoozed, detail: "10 min")
             cancelWakeUpCheck(for: alarmID)
             scheduleSnooze(for: alarm, minutes: 10)
+            BackgroundAlarmService.shared.stopAlarmSound()
+            DispatchQueue.main.async {
+                if self.firingAlarm?.id == alarmID { self.firingAlarm = nil }
+            }
 
         case NotificationAction.wakeConfirm:
             historyStore.record(alarm: alarm, action: .wakeConfirmed)

@@ -79,7 +79,11 @@ struct ContentView: View {
         }
         // Reload state when app returns from background — once-alarms that fired get
         // marked disabled from notification handler, we need to reflect that in the UI.
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)) { _ in
+            BackgroundAlarmService.shared.startMonitoring()
+        }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+            BackgroundAlarmService.shared.stopMonitoring()
             store.reload()
             historyStore.reload()
         }
