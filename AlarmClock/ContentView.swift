@@ -32,6 +32,13 @@ struct ContentView: View {
                         Image(systemName: "plus")
                     }
                 }
+                ToolbarItem(placement: .secondaryAction) {
+                    Button {
+                        openNotificationSettings()
+                    } label: {
+                        Label("Ustawienia powiadomień", systemImage: "bell.badge")
+                    }
+                }
             }
             .sheet(isPresented: $showAddAlarm) {
                 AddAlarmView()
@@ -131,6 +138,12 @@ struct ContentView: View {
 
     private func openSettings() {
         if let url = URL(string: UIApplication.openSettingsURLString) {
+            UIApplication.shared.open(url)
+        }
+    }
+
+    private func openNotificationSettings() {
+        if let url = URL(string: UIApplication.openNotificationSettingsURLString) {
             UIApplication.shared.open(url)
         }
     }

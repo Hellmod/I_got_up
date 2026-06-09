@@ -291,7 +291,7 @@ class NotificationManager: NSObject, ObservableObject, UNUserNotificationCenterD
             // Play sound but skip banner — the full-screen view takes over.
             completionHandler([.sound])
         } else {
-            completionHandler([.banner, .sound, .badge])
+            completionHandler([.banner, .list, .sound, .badge])
         }
     }
 
