@@ -8,8 +8,10 @@ struct AlarmApp: App {
     @StateObject private var notificationManager = NotificationManager.shared
 
     init() {
-        // Register notification categories and check permission status before UI appears
         NotificationManager.shared.setup()
+        // Generate the custom 29-second alarm tone used by UNNotificationSound.
+        // No-op if the file already exists from a previous launch.
+        AlarmSoundGenerator.ensureAlarmSound()
     }
 
     var body: some Scene {

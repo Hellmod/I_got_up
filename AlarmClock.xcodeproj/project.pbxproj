@@ -17,6 +17,7 @@
 		B320000800000000DEADBEEF /* AlarmActiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310001000000000DEADBEEF /* AlarmActiveView.swift */; };
 		B320000900000000DEADBEEF /* AlarmHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310001100000000DEADBEEF /* AlarmHistoryView.swift */; };
 		B320001000000000DEADBEEF /* BackgroundAlarmService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310001200000000DEADBEEF /* BackgroundAlarmService.swift */; };
+		B320001100000000DEADBEEF /* AlarmSoundGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310001300000000DEADBEEF /* AlarmSoundGenerator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,7 @@
 		B310001000000000DEADBEEF /* AlarmActiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmActiveView.swift; sourceTree = "<group>"; };
 		B310001100000000DEADBEEF /* AlarmHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmHistoryView.swift; sourceTree = "<group>"; };
 		B310001200000000DEADBEEF /* BackgroundAlarmService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundAlarmService.swift; sourceTree = "<group>"; };
+		B310001300000000DEADBEEF /* AlarmSoundGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmSoundGenerator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +68,7 @@
 				B310001000000000DEADBEEF /* AlarmActiveView.swift */,
 				B310001100000000DEADBEEF /* AlarmHistoryView.swift */,
 				B310001200000000DEADBEEF /* BackgroundAlarmService.swift */,
+				B310001300000000DEADBEEF /* AlarmSoundGenerator.swift */,
 				B310000900000000DEADBEEF /* AlarmClock.entitlements */,
 			);
 			path = AlarmClock;
@@ -158,6 +161,7 @@
 				B320000800000000DEADBEEF /* AlarmActiveView.swift in Sources */,
 				B320000900000000DEADBEEF /* AlarmHistoryView.swift in Sources */,
 				B320001000000000DEADBEEF /* BackgroundAlarmService.swift in Sources */,
+				B320001100000000DEADBEEF /* AlarmSoundGenerator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
