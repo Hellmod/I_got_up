@@ -335,7 +335,6 @@ class NotificationManager: NSObject, ObservableObject, UNUserNotificationCenterD
             disableOnceAlarm(alarm, in: AlarmStore())
             cancelWakeUpCheck(for: alarmID)
             scheduleWakeUpCheck(for: alarm)
-            BackgroundAlarmService.shared.stopAlarmSound()
             DispatchQueue.main.async {
                 if self.firingAlarm?.id == alarmID { self.firingAlarm = nil }
             }
@@ -344,7 +343,6 @@ class NotificationManager: NSObject, ObservableObject, UNUserNotificationCenterD
             historyStore.record(alarm: alarm, action: .snoozed, detail: "5 min")
             cancelWakeUpCheck(for: alarmID)
             scheduleSnooze(for: alarm, minutes: 5)
-            BackgroundAlarmService.shared.stopAlarmSound()
             DispatchQueue.main.async {
                 if self.firingAlarm?.id == alarmID { self.firingAlarm = nil }
             }
@@ -353,7 +351,6 @@ class NotificationManager: NSObject, ObservableObject, UNUserNotificationCenterD
             historyStore.record(alarm: alarm, action: .snoozed, detail: "10 min")
             cancelWakeUpCheck(for: alarmID)
             scheduleSnooze(for: alarm, minutes: 10)
-            BackgroundAlarmService.shared.stopAlarmSound()
             DispatchQueue.main.async {
                 if self.firingAlarm?.id == alarmID { self.firingAlarm = nil }
             }
