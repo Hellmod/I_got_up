@@ -1,28 +1,36 @@
 import SwiftUI
 import AudioToolbox
+import AVFoundation
 
 // MARK: - AlarmSoundPlayer
 
 /// Loops an alert sound using AudioServices until stopped.
+/// Configures AVAudioSession for playback so audio continues when the screen locks.
 final class AlarmSoundPlayer: ObservableObject {
     private var active = false
 
     func start() {
         active = true
+        configureSession()
         loop()
     }
 
     func stop() {
         active = false
+        try? AVAudioSession.sharedInstance().setActive(false,
+              options: .notifyOthersOnDeactivation)
+    }
+
+    private func configureSession() {
+        let session = AVAudioSession.sharedInstance()
+        try? session.setCategory(.playback, mode: .default, options: [])
+        try? session.setActive(true)
     }
 
     private func loop() {
         guard active else { return }
-        // Sound ID 1005 = alarm.caf (system alarm sound).
-        // Also triggers vibration via PlayAlertSound.
         AudioServicesPlayAlertSoundWithCompletion(SystemSoundID(1005)) { [weak self] in
             guard self?.active == true else { return }
-            // Brief pause between rings so it sounds like a real alarm.
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 self?.loop()
             }
@@ -37,6 +45,7 @@ struct AlarmActiveView: View {
 
     @EnvironmentObject private var notificationManager: NotificationManager
     @EnvironmentObject private var store: AlarmStore
+    @EnvironmentObject private var historyStore: AlarmHistoryStore
     @StateObject private var soundPlayer = AlarmSoundPlayer()
 
     var body: some View {
@@ -114,6 +123,7 @@ struct AlarmActiveView: View {
 
     private func dismissAlarm() {
         soundPlayer.stop()
+        historyStore.record(alarm: alarm, action: .dismissed)
         notificationManager.cancelAlarmBackups(for: alarm.id)
         notificationManager.cancelWakeUpCheck(for: alarm.id)
         notificationManager.firingAlarm = nil
@@ -122,6 +132,7 @@ struct AlarmActiveView: View {
 
     private func snooze(minutes: Int) {
         soundPlayer.stop()
+        historyStore.record(alarm: alarm, action: .snoozed, detail: "\(minutes) min")
         notificationManager.cancelAlarmBackups(for: alarm.id)
         notificationManager.cancelWakeUpCheck(for: alarm.id)
         notificationManager.firingAlarm = nil

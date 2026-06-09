@@ -4,6 +4,7 @@ import UserNotifications
 @main
 struct AlarmApp: App {
     @StateObject private var store = AlarmStore()
+    @StateObject private var historyStore = AlarmHistoryStore()
     @StateObject private var notificationManager = NotificationManager.shared
 
     init() {
@@ -15,6 +16,7 @@ struct AlarmApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(store)
+                .environmentObject(historyStore)
                 .environmentObject(notificationManager)
                 .task {
                     await requestPermissionIfNeeded()

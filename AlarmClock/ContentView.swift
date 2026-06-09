@@ -5,10 +5,12 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject private var store: AlarmStore
     @EnvironmentObject private var notificationManager: NotificationManager
+    @EnvironmentObject private var historyStore: AlarmHistoryStore
 
     @State private var showAddAlarm = false
     @State private var alarmToEdit: Alarm?
     @State private var showPermissionAlert = false
+    @State private var showHistory = false
 
     var body: some View {
         NavigationStack {
@@ -34,6 +36,13 @@ struct ContentView: View {
                 }
                 ToolbarItem(placement: .secondaryAction) {
                     Button {
+                        showHistory = true
+                    } label: {
+                        Label("Historia", systemImage: "clock.arrow.circlepath")
+                    }
+                }
+                ToolbarItem(placement: .secondaryAction) {
+                    Button {
                         openNotificationSettings()
                     } label: {
                         Label("Ustawienia powiadomień", systemImage: "bell.badge")
@@ -45,6 +54,10 @@ struct ContentView: View {
             }
             .sheet(item: $alarmToEdit) { alarm in
                 AddAlarmView(editingAlarm: alarm)
+            }
+            .sheet(isPresented: $showHistory) {
+                AlarmHistoryView()
+                    .environmentObject(historyStore)
             }
             .alert("Brak uprawnień", isPresented: $showPermissionAlert) {
                 Button("Ustawienia") { openSettings() }
@@ -62,6 +75,13 @@ struct ContentView: View {
             AlarmActiveView(alarm: alarm)
                 .environmentObject(notificationManager)
                 .environmentObject(store)
+                .environmentObject(historyStore)
+        }
+        // Reload state when app returns from background — once-alarms that fired get
+        // marked disabled from notification handler, we need to reflect that in the UI.
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+            store.reload()
+            historyStore.reload()
         }
     }
 
@@ -173,6 +193,16 @@ struct AlarmRow: View {
                         .foregroundStyle(.secondary)
                 }
 
+                if alarm.isEnabled {
+                    TimelineView(.periodic(from: .now, by: 60)) { _ in
+                        if let countdown = alarm.countdownString() {
+                            Text(countdown)
+                                .font(.caption)
+                                .foregroundStyle(.orange.opacity(0.9))
+                        }
+                    }
+                }
+
                 if alarm.wakeUpCheckEnabled {
                     HStack(spacing: 4) {
                         Image(systemName: "checkmark.circle")
@@ -206,4 +236,5 @@ struct AlarmRow: View {
     return ContentView()
         .environmentObject(store)
         .environmentObject(NotificationManager.shared)
+        .environmentObject(AlarmHistoryStore())
 }

@@ -192,7 +192,7 @@ class NotificationManager: NSObject, ObservableObject, UNUserNotificationCenterD
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: ids)
     }
 
-    private let wakeUpRepeatCount = 3 // how many reminder notifications before re-ringing
+    private var wakeUpRepeatCount: Int { 3 } // kept for cancelWakeUpCheck compatibility
 
     private func wakeUpCheckID(_ alarmID: UUID, index: Int) -> String {
         "wakeup_\(alarmID)_\(index)"
@@ -206,19 +206,20 @@ class NotificationManager: NSObject, ObservableObject, UNUserNotificationCenterD
         scheduleWakeUpSeries(for: alarm, after: initialDelay)
     }
 
-    /// Sends `wakeUpRepeatCount` reminder notifications 1 minute apart starting at `afterDelay`,
-    /// then schedules a re-ring if the user hasn't responded to any of them.
+    /// Sends reminder notifications every 60 s for `alarm.wakeUpNoResponseTime` minutes,
+    /// then re-rings the alarm if the user hasn't responded.
     private func scheduleWakeUpSeries(for alarm: Alarm, after initialDelay: TimeInterval) {
-        let titles = [
-            "Hej, czy już wstajesz? 👋",
-            "Wstawaj! Ponawianie (2/\(wakeUpRepeatCount)) 👋",
-            "Ostatnie przypomnienie! (3/\(wakeUpRepeatCount)) ⚠️",
-        ]
-
-        for i in 0..<wakeUpRepeatCount {
+        let count = max(1, alarm.wakeUpNoResponseTime)
+        for i in 0..<count {
             let delay = initialDelay + TimeInterval(i * 60)
             let content = UNMutableNotificationContent()
-            content.title = i < titles.count ? titles[i] : "Wstawaj! 👋"
+            if i == 0 {
+                content.title = "Hej, czy już wstajesz? 👋"
+            } else if i == count - 1 {
+                content.title = "Ostatnie przypomnienie! ⚠️ (\(i + 1)/\(count))"
+            } else {
+                content.title = "Wstawaj! 👋 (\(i + 1)/\(count))"
+            }
             content.body = "Potwierdź że wstałeś — lub alarm zaraz zadzwoni ponownie."
             content.sound = .default
             content.categoryIdentifier = NotificationCategory.wakeUpCheck
@@ -229,8 +230,8 @@ class NotificationManager: NSObject, ObservableObject, UNUserNotificationCenterD
                      trigger: UNTimeIntervalNotificationTrigger(timeInterval: delay, repeats: false))
         }
 
-        // Re-ring 1 minute after the last reminder if still no response.
-        let ringDelay = initialDelay + TimeInterval(wakeUpRepeatCount * 60)
+        // Re-ring 1 minute after the last reminder.
+        let ringDelay = initialDelay + TimeInterval(count * 60)
         let ringContent = makeAlarmContent(alarm)
         ringContent.title = "Budzik — brak odpowiedzi! ⏰"
         ringContent.body = "Nie potwierdziłeś wstania. Czas wstawać!"
@@ -287,6 +288,7 @@ class NotificationManager: NSObject, ObservableObject, UNUserNotificationCenterD
             let store = AlarmStore()
             if let alarm = store.alarms.first(where: { $0.id == alarmID }) {
                 DispatchQueue.main.async { self.firingAlarm = alarm }
+                disableOnceAlarm(alarm, in: store)
             }
             // Play sound but skip banner — the full-screen view takes over.
             completionHandler([.sound])
@@ -313,33 +315,42 @@ class NotificationManager: NSObject, ObservableObject, UNUserNotificationCenterD
             completionHandler(); return
         }
 
+        let historyStore = AlarmHistoryStore()
+
         switch response.actionIdentifier {
 
         // User tapped notification body (app was in background/killed) — show in-app UI.
         case UNNotificationDefaultActionIdentifier:
-            if response.notification.request.content.categoryIdentifier == NotificationCategory.alarm {
+            let category = response.notification.request.content.categoryIdentifier
+            if category == NotificationCategory.alarm {
+                disableOnceAlarm(alarm, in: AlarmStore())
                 DispatchQueue.main.async { self.firingAlarm = alarm }
+                cancelWakeUpCheck(for: alarmID)
+                scheduleWakeUpCheck(for: alarm)
             }
-            // Schedule wake-up check in case user doesn't interact with the in-app view.
-            cancelWakeUpCheck(for: alarmID)
-            scheduleWakeUpCheck(for: alarm)
 
         case NotificationAction.dismiss:
+            historyStore.record(alarm: alarm, action: .dismissed)
+            disableOnceAlarm(alarm, in: AlarmStore())
             cancelWakeUpCheck(for: alarmID)
             scheduleWakeUpCheck(for: alarm)
 
         case NotificationAction.snooze5:
+            historyStore.record(alarm: alarm, action: .snoozed, detail: "5 min")
             cancelWakeUpCheck(for: alarmID)
             scheduleSnooze(for: alarm, minutes: 5)
 
         case NotificationAction.snooze10:
+            historyStore.record(alarm: alarm, action: .snoozed, detail: "10 min")
             cancelWakeUpCheck(for: alarmID)
             scheduleSnooze(for: alarm, minutes: 10)
 
         case NotificationAction.wakeConfirm:
+            historyStore.record(alarm: alarm, action: .wakeConfirmed)
             cancelWakeUpCheck(for: alarmID)
 
         case NotificationAction.wakeSnooze:
+            historyStore.record(alarm: alarm, action: .wakePostponed)
             cancelWakeUpCheck(for: alarmID)
             scheduleReRing(for: alarm)
 
@@ -384,6 +395,14 @@ class NotificationManager: NSObject, ObservableObject, UNUserNotificationCenterD
         c.minute = minute
         c.second = 0
         return c
+    }
+
+    /// Marks a one-time alarm as disabled so it doesn't reschedule tomorrow.
+    private func disableOnceAlarm(_ alarm: Alarm, in store: AlarmStore) {
+        guard case .once = alarm.repeatSchedule, alarm.isEnabled else { return }
+        var updated = alarm
+        updated.isEnabled = false
+        store.update(updated)
     }
 
     private func addMinutes(to base: DateComponents, count: Int) -> DateComponents {

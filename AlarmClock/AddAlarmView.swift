@@ -16,6 +16,7 @@ struct AddAlarmView: View {
     @State private var snoozeDuration: Int
     @State private var wakeUpCheckEnabled: Bool
     @State private var wakeUpCheckDelay: Int
+    @State private var wakeUpNoResponseTime: Int
 
     @State private var showSoundPicker = false
     @State private var selectedWeekdays: Set<Weekday>
@@ -36,6 +37,7 @@ struct AddAlarmView: View {
         _snoozeDuration = State(initialValue: alarm?.snoozeDuration ?? 5)
         _wakeUpCheckEnabled = State(initialValue: alarm?.wakeUpCheckEnabled ?? true)
         _wakeUpCheckDelay = State(initialValue: alarm?.wakeUpCheckDelay ?? 3)
+        _wakeUpNoResponseTime = State(initialValue: alarm?.wakeUpNoResponseTime ?? 3)
 
         if case .weekdays(let days) = alarm?.repeatSchedule {
             _selectedWeekdays = State(initialValue: days)
@@ -111,12 +113,17 @@ struct AddAlarmView: View {
                             value: $wakeUpCheckDelay,
                             in: 1...10
                         )
+                        Stepper(
+                            "Alarm po braku odpowiedzi: \(wakeUpNoResponseTime) min",
+                            value: $wakeUpNoResponseTime,
+                            in: 1...15
+                        )
                     }
                 } header: {
                     Text("Weryfikacja obudzenia")
                 } footer: {
                     if wakeUpCheckEnabled {
-                        Text("Po wyłączeniu alarmu, po \(wakeUpCheckDelay) min. zostanie wysłane powiadomienie z prośbą o potwierdzenie. Brak odpowiedzi przez 3 minuty = ponowny dzwonek.")
+                        Text("Po wyłączeniu alarmu, po \(wakeUpCheckDelay) min. zostanie wysłane powiadomienie z prośbą o potwierdzenie. Brak odpowiedzi przez \(wakeUpNoResponseTime) min. = ponowny dzwonek.")
                     }
                 }
             }
@@ -205,7 +212,8 @@ struct AddAlarmView: View {
             soundName: selectedSound,
             snoozeDuration: snoozeDuration,
             wakeUpCheckEnabled: wakeUpCheckEnabled,
-            wakeUpCheckDelay: wakeUpCheckDelay
+            wakeUpCheckDelay: wakeUpCheckDelay,
+            wakeUpNoResponseTime: wakeUpNoResponseTime
         )
 
         if editingAlarm != nil {
