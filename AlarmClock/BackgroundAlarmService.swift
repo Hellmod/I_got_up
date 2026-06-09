@@ -87,9 +87,12 @@ final class BackgroundAlarmService {
             guard fires else { continue }
 
             lastFiredKey[alarm.id] = minuteKey
+
+            // Show full-screen CallKit "incoming call" screen (bypasses silent mode,
+            // no notification banner needed). Also set firingAlarm so AlarmActiveView
+            // appears immediately if user opens app via app-switcher instead of Accept.
+            AlarmCallManager.shared.reportIncomingAlarm(alarm)
             DispatchQueue.main.async {
-                // Notification sound (29 s WAV) already plays via UNNotification.
-                // Just set firingAlarm so AlarmActiveView appears on foreground.
                 NotificationManager.shared.firingAlarm = alarm
             }
         }

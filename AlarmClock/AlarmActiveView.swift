@@ -126,6 +126,7 @@ struct AlarmActiveView: View {
 
     private func dismissAlarm() {
         soundPlayer.stop()
+        AlarmCallManager.shared.endActiveCall()
         historyStore.record(alarm: alarm, action: .dismissed)
         notificationManager.cancelAlarmBackups(for: alarm.id)
         notificationManager.cancelWakeUpCheck(for: alarm.id)
@@ -135,6 +136,7 @@ struct AlarmActiveView: View {
 
     private func snooze(minutes: Int) {
         soundPlayer.stop()
+        AlarmCallManager.shared.endActiveCall()
         historyStore.record(alarm: alarm, action: .snoozed, detail: "\(minutes) min")
         notificationManager.cancelAlarmBackups(for: alarm.id)
         notificationManager.cancelWakeUpCheck(for: alarm.id)
