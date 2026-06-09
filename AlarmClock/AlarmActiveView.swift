@@ -51,7 +51,6 @@ struct AlarmActiveView: View {
                     Image(systemName: "alarm.fill")
                         .font(.system(size: 56))
                         .foregroundStyle(.orange)
-                        .symbolEffect(.pulse)
 
                     Text(alarm.timeString)
                         .font(.system(size: 96, weight: .thin, design: .rounded))
