@@ -3,32 +3,24 @@ import Foundation
 
 // MARK: - BackgroundAlarmService
 //
-// Keeps a silent AVAudioEngine running when the app is in the background so that
-// the OS doesn't suspend it. A periodic timer then detects when an alarm is due
-// and plays the alarm tone directly — no user interaction required.
+// Keeps an AVAudioPlayer loop running while the app is minimised so iOS does not
+// suspend the process (requires UIBackgroundModes: audio).  A periodic timer then
+// checks whether any enabled alarm is due and plays a synthesised beep-beep tone
+// without requiring the user to tap a notification.
 //
-// Limitation: this only works when the app was previously opened and is minimised
-// (not killed). A killed app cannot be woken up by third-party code on iOS.
+// Limitation: works only when the app is minimised (background), not killed.
+// iOS does not allow third-party apps to self-launch from a terminated state.
 
 final class BackgroundAlarmService {
     static let shared = BackgroundAlarmService()
 
-    private let engine = AVAudioEngine()
-    private let silentNode = AVAudioPlayerNode()
-    private let alarmNode  = AVAudioPlayerNode()
-    private let format = AVAudioFormat(standardFormatWithSampleRate: 44100, channels: 1)!
-
+    private var keepAlivePlayer: AVAudioPlayer?
+    private var alarmPlayer: AVAudioPlayer?
     private var checkTimer: Timer?
-    private var lastFiredKey: [UUID: String] = [:]   // prevents double-fire within same minute
+    private var lastFiredKey: [UUID: String] = [:]  // prevents double-fire within same minute
     private(set) var isMonitoring = false
-    private var alarmSoundActive = false
 
-    private init() {
-        engine.attach(silentNode)
-        engine.attach(alarmNode)
-        engine.connect(silentNode, to: engine.mainMixerNode, format: format)
-        engine.connect(alarmNode,  to: engine.mainMixerNode, format: format)
-    }
+    private init() {}
 
     // MARK: - Public API
 
@@ -40,37 +32,41 @@ final class BackgroundAlarmService {
             let session = AVAudioSession.sharedInstance()
             try session.setCategory(.playback, options: [.mixWithOthers])
             try session.setActive(true)
-
-            silentNode.scheduleBuffer(makeSilentBuffer(), at: nil, options: .loops)
-            if !engine.isRunning { try engine.start() }
-            silentNode.play()
-
-            checkTimer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true) { [weak self] _ in
-                self?.checkAlarms()
-            }
-            checkAlarms() // check immediately
         } catch {
+            print("❌ BackgroundAlarmService session: \(error)")
             isMonitoring = false
-            print("❌ BackgroundAlarmService start error: \(error)")
+            return
         }
+
+        // Near-silent loop — keeps the audio session alive so the timer keeps firing.
+        let silentData = makeWAV(duration: 1.0) { _ in 0 }
+        keepAlivePlayer = try? AVAudioPlayer(data: silentData)
+        keepAlivePlayer?.volume = 0.0
+        keepAlivePlayer?.numberOfLoops = -1
+        keepAlivePlayer?.prepareToPlay()
+        keepAlivePlayer?.play()
+
+        checkTimer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true) { [weak self] _ in
+            self?.checkAlarms()
+        }
+        checkAlarms()
     }
 
-    /// Stop background alarm sound without stopping the keep-alive engine.
-    /// Called by AlarmActiveView when it takes over sound playback.
+    /// Stop alarm sound only — keep-alive stays running until stopMonitoring().
+    /// Called by AlarmActiveView when it takes over playback.
     func stopAlarmSound() {
-        alarmSoundActive = false
-        alarmNode.stop()
+        alarmPlayer?.stop()
+        alarmPlayer = nil
     }
 
     /// Stop everything — called when app returns to foreground.
     func stopMonitoring() {
         isMonitoring = false
-        alarmSoundActive = false
         checkTimer?.invalidate()
         checkTimer = nil
-        alarmNode.stop()
-        silentNode.stop()
-        engine.stop()
+        stopAlarmSound()
+        keepAlivePlayer?.stop()
+        keepAlivePlayer = nil
         try? AVAudioSession.sharedInstance().setActive(false,
               options: .notifyOthersOnDeactivation)
     }
@@ -100,62 +96,64 @@ final class BackgroundAlarmService {
             case .weekdays(let days):
                 shouldFire = days.contains { $0.calendarWeekday == comps.weekday }
             }
-
             guard shouldFire else { continue }
+
             lastFiredKey[alarm.id] = minuteKey
             fireAlarm(alarm)
         }
     }
 
     private func fireAlarm(_ alarm: Alarm) {
-        alarmSoundActive = true
+        // Beep-beep pattern: two 880 Hz pulses + silence, 0.8 s total, looped.
+        let beepData = makeWAV(duration: 0.8) { t in
+            let inBeep = (t < 0.15) || (t >= 0.20 && t < 0.35)
+            return inBeep ? sin(2.0 * .pi * 880.0 * t) * 0.85 : 0
+        }
 
-        // Schedule looping alarm tone via the engine (plays even when screen is locked)
-        alarmNode.scheduleBuffer(makeAlarmBuffer(), at: nil, options: .loops)
-        alarmNode.play()
+        alarmPlayer = try? AVAudioPlayer(data: beepData)
+        alarmPlayer?.volume = 1.0
+        alarmPlayer?.numberOfLoops = -1
+        alarmPlayer?.prepareToPlay()
+        alarmPlayer?.play()
 
-        // Notify in-app UI to show AlarmActiveView
         DispatchQueue.main.async {
             NotificationManager.shared.firingAlarm = alarm
         }
     }
 
-    // MARK: - Audio buffers
+    // MARK: - WAV synthesis
 
-    /// ~0.1s of silence — looped to keep the audio session alive in background.
-    private func makeSilentBuffer() -> AVAudioPCMBuffer {
-        let frames = AVAudioFrameCount(4410) // 0.1 s
-        let buf = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: frames)!
-        buf.frameLength = frames
-        // floatChannelData is already zero-initialised → silence
-        return buf
-    }
+    /// Generates a mono 16-bit 44.1 kHz WAV blob from a sample generator.
+    private func makeWAV(duration: Double, generator: (Double) -> Double) -> Data {
+        let sampleRate = 44100
+        let numSamples = Int(Double(sampleRate) * duration)
+        let pcmSize = numSamples * 2   // 16-bit → 2 bytes/sample
 
-    /// A "beep-beep" pattern: two 880 Hz pulses + pause, ~0.8 s total, looped.
-    private func makeAlarmBuffer() -> AVAudioPCMBuffer {
-        let sampleRate = 44100.0
-        // (frequency Hz, duration s, amplitude)
-        let segments: [(Double, Double, Float)] = [
-            (880, 0.15, 0.85),
-            (0,   0.05, 0),
-            (880, 0.15, 0.85),
-            (0,   0.45, 0),
-        ]
-        let totalFrames = AVAudioFrameCount(segments.reduce(0.0) { $0 + $1.1 } * sampleRate)
-        let buf = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: totalFrames)!
-        buf.frameLength = totalFrames
-        let out = buf.floatChannelData![0]
-        var offset = 0
-        for (freq, dur, amp) in segments {
-            let count = Int(dur * sampleRate)
-            for i in 0..<count {
-                let t = Double(i) / sampleRate
-                out[offset + i] = freq > 0
-                    ? Float(sin(2.0 * .pi * freq * t)) * amp
-                    : 0
-            }
-            offset += count
+        var data = Data()
+        data.reserveCapacity(44 + pcmSize)
+
+        func le<T: FixedWidthInteger>(_ v: T) {
+            var x = v.littleEndian
+            withUnsafeBytes(of: &x) { data.append(contentsOf: $0) }
         }
-        return buf
+
+        // RIFF / WAVE / fmt  / data  chunks
+        data.append(contentsOf: "RIFF".utf8); le(UInt32(36 + pcmSize))
+        data.append(contentsOf: "WAVE".utf8)
+        data.append(contentsOf: "fmt ".utf8); le(UInt32(16))
+        le(UInt16(1))                              // PCM
+        le(UInt16(1))                              // mono
+        le(UInt32(sampleRate))
+        le(UInt32(sampleRate * 2))                 // byte rate
+        le(UInt16(2))                              // block align
+        le(UInt16(16))                             // bits/sample
+        data.append(contentsOf: "data".utf8); le(UInt32(pcmSize))
+
+        for i in 0..<numSamples {
+            let t = Double(i) / Double(sampleRate)
+            let v = max(-1.0, min(1.0, generator(t)))
+            le(Int16(v * Double(Int16.max)))
+        }
+        return data
     }
 }
