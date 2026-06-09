@@ -168,6 +168,9 @@ class NotificationManager: NSObject, ObservableObject, UNUserNotificationCenterD
         ids += [NotificationID.wakeUpCheck(for: alarm.id),
                 NotificationID.snooze(for: alarm.id),
                 NotificationID.noResponseRing(for: alarm.id)]
+        for i in 0..<wakeUpRepeatCount {
+            ids.append(wakeUpCheckID(alarm.id, index: i))
+        }
 
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ids)
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: ids)
@@ -180,38 +183,60 @@ class NotificationManager: NSObject, ObservableObject, UNUserNotificationCenterD
     }
 
     func cancelWakeUpCheck(for alarmID: UUID) {
-        let ids = [NotificationID.wakeUpCheck(for: alarmID),
-                   NotificationID.noResponseRing(for: alarmID)]
+        var ids = [NotificationID.noResponseRing(for: alarmID),
+                   NotificationID.wakeUpCheck(for: alarmID)] // legacy single-check ID
+        for i in 0..<wakeUpRepeatCount {
+            ids.append(wakeUpCheckID(alarmID, index: i))
+        }
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ids)
+        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: ids)
+    }
+
+    private let wakeUpRepeatCount = 3 // how many reminder notifications before re-ringing
+
+    private func wakeUpCheckID(_ alarmID: UUID, index: Int) -> String {
+        "wakeup_\(alarmID)_\(index)"
     }
 
     // MARK: - Wake-Up Check
 
     func scheduleWakeUpCheck(for alarm: Alarm) {
         guard alarm.wakeUpCheckEnabled else { return }
+        let initialDelay = TimeInterval(alarm.wakeUpCheckDelay * 60)
+        scheduleWakeUpSeries(for: alarm, after: initialDelay)
+    }
 
-        let delay = TimeInterval(alarm.wakeUpCheckDelay * 60)
+    /// Sends `wakeUpRepeatCount` reminder notifications 1 minute apart starting at `afterDelay`,
+    /// then schedules a re-ring if the user hasn't responded to any of them.
+    private func scheduleWakeUpSeries(for alarm: Alarm, after initialDelay: TimeInterval) {
+        let titles = [
+            "Hej, czy już wstajesz? 👋",
+            "Wstawaj! Ponawianie (2/\(wakeUpRepeatCount)) 👋",
+            "Ostatnie przypomnienie! (3/\(wakeUpRepeatCount)) ⚠️",
+        ]
 
-        let checkContent = UNMutableNotificationContent()
-        checkContent.title = "Hej, czy już wstajesz? 👋"
-        checkContent.body = "Potwierdź, że wstałeś z łóżka!"
-        checkContent.sound = .default
-        checkContent.categoryIdentifier = NotificationCategory.wakeUpCheck
-        checkContent.userInfo = ["alarmID": alarm.id.uuidString]
-        if #available(iOS 15.0, *) { checkContent.interruptionLevel = .timeSensitive }
+        for i in 0..<wakeUpRepeatCount {
+            let delay = initialDelay + TimeInterval(i * 60)
+            let content = UNMutableNotificationContent()
+            content.title = i < titles.count ? titles[i] : "Wstawaj! 👋"
+            content.body = "Potwierdź że wstałeś — lub alarm zaraz zadzwoni ponownie."
+            content.sound = .default
+            content.categoryIdentifier = NotificationCategory.wakeUpCheck
+            content.userInfo = ["alarmID": alarm.id.uuidString]
+            if #available(iOS 15.0, *) { content.interruptionLevel = .timeSensitive }
+            schedule(identifier: wakeUpCheckID(alarm.id, index: i),
+                     content: content,
+                     trigger: UNTimeIntervalNotificationTrigger(timeInterval: delay, repeats: false))
+        }
 
-        schedule(identifier: NotificationID.wakeUpCheck(for: alarm.id),
-                 content: checkContent,
-                 trigger: UNTimeIntervalNotificationTrigger(timeInterval: delay, repeats: false))
-
-        // If no response within 3 minutes after the check, ring again.
-        let noResponseDelay = delay + 3 * 60
+        // Re-ring 1 minute after the last reminder if still no response.
+        let ringDelay = initialDelay + TimeInterval(wakeUpRepeatCount * 60)
         let ringContent = makeAlarmContent(alarm)
-        ringContent.title = "Budzik — brak odpowiedzi!"
-        ringContent.body = "Nie potwierdziłeś wstania. Czas wstawać! ⏰"
+        ringContent.title = "Budzik — brak odpowiedzi! ⏰"
+        ringContent.body = "Nie potwierdziłeś wstania. Czas wstawać!"
         schedule(identifier: NotificationID.noResponseRing(for: alarm.id),
                  content: ringContent,
-                 trigger: UNTimeIntervalNotificationTrigger(timeInterval: noResponseDelay, repeats: false))
+                 trigger: UNTimeIntervalNotificationTrigger(timeInterval: ringDelay, repeats: false))
     }
 
     // MARK: - Snooze
@@ -224,18 +249,10 @@ class NotificationManager: NSObject, ObservableObject, UNUserNotificationCenterD
                  content: content,
                  trigger: UNTimeIntervalNotificationTrigger(timeInterval: delay, repeats: false))
 
-        guard alarm.wakeUpCheckEnabled else { return }
-        let checkDelay = delay + TimeInterval(alarm.wakeUpCheckDelay * 60)
-        let checkContent = UNMutableNotificationContent()
-        checkContent.title = "Hej, czy już wstajesz? 👋"
-        checkContent.body = "Twoja drzemka minęła — czy wstałeś?"
-        checkContent.sound = .default
-        checkContent.categoryIdentifier = NotificationCategory.wakeUpCheck
-        checkContent.userInfo = ["alarmID": alarm.id.uuidString]
-        if #available(iOS 15.0, *) { checkContent.interruptionLevel = .timeSensitive }
-        schedule(identifier: NotificationID.wakeUpCheck(for: alarm.id),
-                 content: checkContent,
-                 trigger: UNTimeIntervalNotificationTrigger(timeInterval: checkDelay, repeats: false))
+        if alarm.wakeUpCheckEnabled {
+            let checkStart = delay + TimeInterval(alarm.wakeUpCheckDelay * 60)
+            scheduleWakeUpSeries(for: alarm, after: checkStart)
+        }
     }
 
     func scheduleReRing(for alarm: Alarm) {
@@ -247,18 +264,10 @@ class NotificationManager: NSObject, ObservableObject, UNUserNotificationCenterD
                  content: content,
                  trigger: UNTimeIntervalNotificationTrigger(timeInterval: delay, repeats: false))
 
-        guard alarm.wakeUpCheckEnabled else { return }
-        let checkDelay = delay + TimeInterval(alarm.wakeUpCheckDelay * 60)
-        let checkContent = UNMutableNotificationContent()
-        checkContent.title = "Hej, czy już wstajesz? 👋"
-        checkContent.body = "Potwierdź, że tym razem wstałeś!"
-        checkContent.sound = .default
-        checkContent.categoryIdentifier = NotificationCategory.wakeUpCheck
-        checkContent.userInfo = ["alarmID": alarm.id.uuidString]
-        if #available(iOS 15.0, *) { checkContent.interruptionLevel = .timeSensitive }
-        schedule(identifier: NotificationID.wakeUpCheck(for: alarm.id),
-                 content: checkContent,
-                 trigger: UNTimeIntervalNotificationTrigger(timeInterval: checkDelay, repeats: false))
+        if alarm.wakeUpCheckEnabled {
+            let checkStart = delay + TimeInterval(alarm.wakeUpCheckDelay * 60)
+            scheduleWakeUpSeries(for: alarm, after: checkStart)
+        }
     }
 
     // MARK: - UNUserNotificationCenterDelegate
