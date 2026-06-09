@@ -21,8 +21,7 @@ final class AlarmCallManager: NSObject, CXProviderDelegate {
     private var activeAlarm: Alarm?
 
     private override init() {
-        let config = CXProviderConfiguration()
-        config.localizedName  = "Budzik"
+        let config = CXProviderConfiguration(localizedName: "Budzik")
         config.supportsVideo  = false
         config.maximumCallsPerCallGroup = 1
         config.supportedHandleTypes = [.generic]
