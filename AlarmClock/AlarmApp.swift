@@ -5,14 +5,12 @@ import UserNotifications
 struct AlarmApp: App {
     @StateObject private var store = AlarmStore()
     @StateObject private var historyStore = AlarmHistoryStore()
-    @StateObject private var notificationManager = NotificationManager.shared
     @StateObject private var alarmKitManager = AlarmKitManager.shared
 
     init() {
-        // Register wake-up check categories and clean up legacy notification alarms.
-        NotificationManager.shared.setup()
         // Synthesize the alarm tone files used by the sound picker and AlarmKit.
         AlarmToneGenerator.ensureSounds()
+        cleanUpLegacyNotifications()
     }
 
     var body: some Scene {
@@ -20,10 +18,8 @@ struct AlarmApp: App {
             ContentView()
                 .environmentObject(store)
                 .environmentObject(historyStore)
-                .environmentObject(notificationManager)
                 .environmentObject(alarmKitManager)
                 .task {
-                    await requestPermissionIfNeeded()
                     // Ask for the AlarmKit permission, then make sure every
                     // enabled alarm is scheduled as a real system alarm.
                     if await AlarmKitManager.shared.requestAuthorizationIfNeeded() {
@@ -33,12 +29,13 @@ struct AlarmApp: App {
         }
     }
 
-    @MainActor
-    private func requestPermissionIfNeeded() async {
-        let center = UNUserNotificationCenter.current()
-        let settings = await center.notificationSettings()
-        if settings.authorizationStatus == .notDetermined {
-            notificationManager.requestPermission()
-        }
+    /// The app no longer uses notifications at all — remove anything still
+    /// pending from earlier versions (wake-up check reminders etc.).
+    private func cleanUpLegacyNotifications() {
+        let key = "notifications_removed_v2"
+        guard !UserDefaults.standard.bool(forKey: key) else { return }
+        UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+        UNUserNotificationCenter.current().removeAllDeliveredNotifications()
+        UserDefaults.standard.set(true, forKey: key)
     }
 }

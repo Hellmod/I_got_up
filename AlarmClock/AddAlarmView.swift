@@ -123,7 +123,7 @@ struct AddAlarmView: View {
                         Stepper(
                             "Delay: \(wakeUpCheckDelay) min",
                             value: $wakeUpCheckDelay,
-                            in: 1...10
+                            in: 0...10
                         )
                         Stepper(
                             "Re-ring after no response: \(wakeUpNoResponseTime) min",
@@ -135,7 +135,7 @@ struct AddAlarmView: View {
                     Text("Wake-up verification")
                 } footer: {
                     if wakeUpCheckEnabled {
-                        Text("After dismissing the alarm, a confirmation request arrives after \(wakeUpCheckDelay) min. No response for \(wakeUpNoResponseTime) min — the alarm rings again.")
+                        Text("After stopping the alarm, a \(wakeUpCheckDelay) min delay starts during which you can't confirm yet. Then you have \(wakeUpNoResponseTime) min to confirm you're up — otherwise the alarm rings again.")
                     }
                 }
             }

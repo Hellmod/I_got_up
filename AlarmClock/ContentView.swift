@@ -4,16 +4,13 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject private var store: AlarmStore
-    @EnvironmentObject private var notificationManager: NotificationManager
     @EnvironmentObject private var historyStore: AlarmHistoryStore
     @EnvironmentObject private var alarmKit: AlarmKitManager
 
     @State private var showAddAlarm = false
     @State private var alarmToEdit: Alarm?
-    @State private var showPermissionAlert = false
     @State private var showHistory = false
     @State private var showOnboarding = false
-    @State private var showNotificationInfo = false
     @AppStorage("onboarding_seen_v1") private var onboardingSeen = false
 
     var body: some View {
@@ -29,11 +26,7 @@ struct ContentView: View {
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button {
-                        if notificationManager.permissionDenied {
-                            showPermissionAlert = true
-                        } else {
-                            showAddAlarm = true
-                        }
+                        showAddAlarm = true
                     } label: {
                         Image(systemName: "plus")
                     }
@@ -43,13 +36,6 @@ struct ContentView: View {
                         showHistory = true
                     } label: {
                         Label("History", systemImage: "clock.arrow.circlepath")
-                    }
-                }
-                ToolbarItem(placement: .secondaryAction) {
-                    Button {
-                        showNotificationInfo = true
-                    } label: {
-                        Label("Notification Settings", systemImage: "bell.badge")
                     }
                 }
                 ToolbarItem(placement: .secondaryAction) {
@@ -76,27 +62,15 @@ struct ContentView: View {
             .onAppear {
                 if !onboardingSeen { showOnboarding = true }
             }
-            .alert("Notification Settings", isPresented: $showNotificationInfo) {
-                Button("Open Settings") { openNotificationSettings() }
-                Button("Cancel", role: .cancel) {}
-            } message: {
-                Text("This is optional — alarms will ring either way. We recommend it for Wake-Up Check: set the banner style to Persistent so the reminder stays on screen until you respond, and keep notification sounds enabled.")
-            }
-            .alert("No Permission", isPresented: $showPermissionAlert) {
-                Button("Settings") { openSettings() }
-                Button("Cancel", role: .cancel) {}
-            } message: {
-                Text("To make alarms work, enable notifications for this app in Settings.")
-            }
             .overlay(permissionBanner, alignment: .top)
         }
-        // Confirmation screen opened by tapping a Wake-Up Check notification.
+        // Wake-up confirmation screen (two-phase countdown).
         .fullScreenCover(item: Binding(
-            get: { notificationManager.pendingWakeUpAlarm },
-            set: { notificationManager.pendingWakeUpAlarm = $0 }
+            get: { alarmKit.pendingWakeUpAlarm },
+            set: { alarmKit.pendingWakeUpAlarm = $0 }
         )) { alarm in
             WakeUpCheckView(alarm: alarm)
-                .environmentObject(notificationManager)
+                .environmentObject(alarmKit)
                 .environmentObject(historyStore)
         }
         // Reload state when app returns to foreground — alarms stopped, snoozed or
@@ -105,11 +79,11 @@ struct ContentView: View {
             store.reload()
             historyStore.reload()
             // Wake-up check countdown is running (user tapped the Live Activity
-            // or just opened the app) — ask for confirmation directly.
-            if notificationManager.pendingWakeUpAlarm == nil,
+            // or just opened the app) — show the confirmation screen directly.
+            if alarmKit.pendingWakeUpAlarm == nil,
                let id = AlarmKitManager.shared.alarmIDsWithPendingReRing().first,
                let alarm = store.alarms.first(where: { $0.id == id }) {
-                notificationManager.pendingWakeUpAlarm = alarm
+                alarmKit.pendingWakeUpAlarm = alarm
             }
         }
     }
@@ -159,11 +133,6 @@ struct ContentView: View {
                        title: "Alarms permission missing",
                        message: "The alarm won't ring — enable alarms in Settings.")
             }
-            if notificationManager.permissionDenied {
-                banner(icon: "bell.slash.fill",
-                       title: "Notifications disabled",
-                       message: "Wake-Up Check won't work without permission.")
-            }
         }
     }
 
@@ -200,12 +169,6 @@ struct ContentView: View {
 
     private func openSettings() {
         if let url = URL(string: UIApplication.openSettingsURLString) {
-            UIApplication.shared.open(url)
-        }
-    }
-
-    private func openNotificationSettings() {
-        if let url = URL(string: UIApplication.openNotificationSettingsURLString) {
             UIApplication.shared.open(url)
         }
     }
@@ -277,7 +240,6 @@ struct AlarmRow: View {
     store.add(Alarm(id: UUID(), hour: 9, minute: 0, label: "Weekend", repeatSchedule: .weekdays([.saturday, .sunday]), wakeUpCheckEnabled: false))
     return ContentView()
         .environmentObject(store)
-        .environmentObject(NotificationManager.shared)
         .environmentObject(AlarmHistoryStore())
         .environmentObject(AlarmKitManager.shared)
 }

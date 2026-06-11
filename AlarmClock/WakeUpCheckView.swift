@@ -2,65 +2,102 @@ import SwiftUI
 
 // MARK: - WakeUpCheckView
 //
-// Shown full-screen when the user taps the body of a Wake-Up Check notification.
-// The same actions are available by long-pressing the notification, but this
-// screen makes them obvious for users who don't know about long-press.
+// The in-app wake-up verification screen with two countdown phases:
+//   Phase 1 (delay):   a timer counts down the configured delay — the confirm
+//                      button is locked so you can't dismiss the check in
+//                      half-sleep right after stopping the alarm.
+//   Phase 2 (response): a second timer shows how long until the alarm rings
+//                      again — now "Yes, I'm up" (and "Not yet") are active.
 
 struct WakeUpCheckView: View {
     let alarm: Alarm
 
-    @EnvironmentObject private var notificationManager: NotificationManager
+    @EnvironmentObject private var alarmKit: AlarmKitManager
     @EnvironmentObject private var historyStore: AlarmHistoryStore
 
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
 
-            VStack(spacing: 0) {
-                Spacer()
+            TimelineView(.periodic(from: .now, by: 1)) { timeline in
+                content(now: timeline.date)
+            }
+        }
+    }
 
-                VStack(spacing: 16) {
-                    Image(systemName: "sun.max.fill")
-                        .font(.system(size: 64))
-                        .foregroundStyle(.yellow)
+    // MARK: - Phases
 
-                    Text("Are you up yet?")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.white)
+    @ViewBuilder
+    private func content(now: Date) -> some View {
+        let state = alarmKit.wakeCheckState(for: alarm.id)
+        // Without stored state (stale entry) fall back to an unlocked confirm.
+        let delayEnd = state?.delayEnd ?? now
+        let ringDate = state?.ringDate ?? now
+        let inDelayPhase = now < delayEnd
 
-                    VStack(spacing: 4) {
-                        Text("Alarm \(alarm.timeString)")
-                            .font(.title3)
-                            .foregroundStyle(.white.opacity(0.6))
-                        if !alarm.label.isEmpty {
-                            Text(alarm.label)
-                                .font(.subheadline)
-                                .foregroundStyle(.white.opacity(0.4))
-                        }
+        VStack(spacing: 0) {
+            Spacer()
+
+            VStack(spacing: 18) {
+                Image(systemName: inDelayPhase ? "hourglass" : "sun.max.fill")
+                    .font(.system(size: 60))
+                    .foregroundStyle(inDelayPhase ? .orange : .yellow)
+
+                Text("Are you up yet?")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.white)
+
+                VStack(spacing: 4) {
+                    Text("Alarm \(alarm.timeString)")
+                        .font(.title3)
+                        .foregroundStyle(.white.opacity(0.6))
+                    if !alarm.label.isEmpty {
+                        Text(alarm.label)
+                            .font(.subheadline)
+                            .foregroundStyle(.white.opacity(0.4))
                     }
-
-                    Text("Confirm you're awake — otherwise the alarm will ring again.")
-                        .font(.subheadline)
-                        .foregroundStyle(.white.opacity(0.5))
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 32)
                 }
 
-                Spacer()
+                VStack(spacing: 6) {
+                    Text(inDelayPhase ? "You can confirm in:" : "Alarm will ring again in:")
+                        .font(.subheadline)
+                        .foregroundStyle(.white.opacity(0.6))
 
-                VStack(spacing: 14) {
-                    Button(action: confirm) {
-                        Label("Yes, I'm up", systemImage: "checkmark.circle.fill")
-                            .font(.headline)
-                            .fontWeight(.semibold)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 20)
-                            .background(Color.green)
-                            .foregroundStyle(.white)
-                            .cornerRadius(18)
+                    Text(timerInterval: now...max(inDelayPhase ? delayEnd : ringDate, now),
+                         countsDown: true)
+                        .font(.system(size: 56, weight: .thin, design: .rounded))
+                        .monospacedDigit()
+                        .multilineTextAlignment(.center)
+                        .foregroundStyle(inDelayPhase ? .orange : .white)
+
+                    if inDelayPhase {
+                        Text("The confirm button unlocks when the countdown ends.")
+                            .font(.caption)
+                            .foregroundStyle(.white.opacity(0.45))
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 32)
                     }
+                }
+                .padding(.top, 8)
+            }
 
+            Spacer()
+
+            VStack(spacing: 14) {
+                Button(action: confirm) {
+                    Label("Yes, I'm up", systemImage: inDelayPhase ? "lock.fill" : "checkmark.circle.fill")
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 20)
+                        .background(inDelayPhase ? Color.gray.opacity(0.35) : Color.green)
+                        .foregroundStyle(inDelayPhase ? .white.opacity(0.5) : .white)
+                        .cornerRadius(18)
+                }
+                .disabled(inDelayPhase)
+
+                if !inDelayPhase {
                     Button(action: postpone) {
                         Label("Not yet — alarm in 5 min", systemImage: "moon.zzz.fill")
                             .font(.subheadline)
@@ -71,9 +108,9 @@ struct WakeUpCheckView: View {
                             .cornerRadius(18)
                     }
                 }
-                .padding(.horizontal, 28)
-                .padding(.bottom, 56)
             }
+            .padding(.horizontal, 28)
+            .padding(.bottom, 56)
         }
     }
 
@@ -81,15 +118,14 @@ struct WakeUpCheckView: View {
 
     private func confirm() {
         historyStore.record(alarm: alarm, action: .wakeConfirmed)
-        notificationManager.cancelWakeUpCheck(for: alarm.id)
-        notificationManager.pendingWakeUpAlarm = nil
+        alarmKit.cancelWakeUpCheck(for: alarm.id)
+        alarmKit.pendingWakeUpAlarm = nil
     }
 
     private func postpone() {
         historyStore.record(alarm: alarm, action: .wakePostponed)
-        notificationManager.cancelWakeUpCheck(for: alarm.id)
-        Task { await AlarmKitManager.shared.scheduleReRing(for: alarm, after: 5 * 60) }
-        notificationManager.pendingWakeUpAlarm = nil
+        Task { await alarmKit.postponeWakeUpCheck(for: alarm) }
+        alarmKit.pendingWakeUpAlarm = nil
     }
 }
 
@@ -97,6 +133,6 @@ struct WakeUpCheckView: View {
     WakeUpCheckView(
         alarm: Alarm(id: UUID(), hour: 7, minute: 30, label: "Praca")
     )
-    .environmentObject(NotificationManager.shared)
+    .environmentObject(AlarmKitManager.shared)
     .environmentObject(AlarmHistoryStore())
 }

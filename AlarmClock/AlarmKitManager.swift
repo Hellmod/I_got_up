@@ -2,6 +2,15 @@ import AlarmKit
 import AppIntents
 import SwiftUI
 
+// MARK: - WakeCheckState
+
+/// Persisted phases of a running wake-up check cycle.
+struct WakeCheckState: Codable {
+    var alarmID: UUID
+    var delayEnd: Date   // phase 1 ends: until then confirmation is locked
+    var ringDate: Date   // phase 2 ends: the re-ring alarm fires
+}
+
 // MARK: - AlarmKitManager
 // (EmptyMetadata lives in AlarmMetadataShared.swift — shared with the widget.)
 //
@@ -19,8 +28,11 @@ final class AlarmKitManager: ObservableObject {
 
     /// True when the user denied the alarms permission — alarms cannot ring.
     @Published var permissionDenied = false
+    /// Set when the wake-up confirmation screen should be presented.
+    @Published var pendingWakeUpAlarm: Alarm?
 
     private let reRingMapKey = "alarmkit_rering_ids"
+    private let wakeCheckStatesKey = "wake_check_states_v1"
 
     private init() {}
 
@@ -118,6 +130,61 @@ final class AlarmKitManager: ObservableObject {
     func alarmIDsWithPendingReRing() -> [UUID] {
         let map = (UserDefaults.standard.dictionary(forKey: reRingMapKey) as? [String: String]) ?? [:]
         return map.keys.compactMap(UUID.init(uuidString:))
+    }
+
+    // MARK: - Wake-Up Check cycle
+    // Notification-free: a delay phase (confirmation locked), then a response
+    // window, then the AlarmKit re-ring fires. The in-app WakeUpCheckView reads
+    // WakeCheckState to render both countdown timers.
+
+    func startWakeUpCheck(for alarm: Alarm) async {
+        guard alarm.wakeUpCheckEnabled else { return }
+        await scheduleWakeCheck(
+            for: alarm,
+            delay: TimeInterval(alarm.wakeUpCheckDelay * 60),
+            response: TimeInterval(max(1, alarm.wakeUpNoResponseTime) * 60))
+    }
+
+    /// "Not yet" — ring again in 5 minutes, confirmation available immediately.
+    func postponeWakeUpCheck(for alarm: Alarm) async {
+        await scheduleWakeCheck(for: alarm, delay: 0, response: 5 * 60)
+    }
+
+    func cancelWakeUpCheck(for alarmID: UUID) {
+        clearWakeCheckState(for: alarmID)
+        cancelReRing(for: alarmID)
+    }
+
+    func wakeCheckState(for alarmID: UUID) -> WakeCheckState? {
+        loadWakeCheckStates().first { $0.alarmID == alarmID }
+    }
+
+    private func scheduleWakeCheck(for alarm: Alarm, delay: TimeInterval, response: TimeInterval) async {
+        cancelWakeUpCheck(for: alarm.id)
+        let now = Date()
+        var states = loadWakeCheckStates()
+        states.append(WakeCheckState(
+            alarmID: alarm.id,
+            delayEnd: now.addingTimeInterval(delay),
+            ringDate: now.addingTimeInterval(delay + response)))
+        saveWakeCheckStates(states)
+        await scheduleReRing(for: alarm, after: delay + response)
+    }
+
+    private func loadWakeCheckStates() -> [WakeCheckState] {
+        guard let data = UserDefaults.standard.data(forKey: wakeCheckStatesKey),
+              let states = try? JSONDecoder().decode([WakeCheckState].self, from: data) else { return [] }
+        return states
+    }
+
+    private func saveWakeCheckStates(_ states: [WakeCheckState]) {
+        if let data = try? JSONEncoder().encode(states) {
+            UserDefaults.standard.set(data, forKey: wakeCheckStatesKey)
+        }
+    }
+
+    private func clearWakeCheckState(for alarmID: UUID) {
+        saveWakeCheckStates(loadWakeCheckStates().filter { $0.alarmID != alarmID })
     }
 
     // MARK: - Configuration builders

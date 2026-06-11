@@ -11,7 +11,6 @@
 		B320000200000000DEADBEEF /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310000200000000DEADBEEF /* ContentView.swift */; };
 		B320000300000000DEADBEEF /* AddAlarmView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310000300000000DEADBEEF /* AddAlarmView.swift */; };
 		B320000400000000DEADBEEF /* AlarmModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310000400000000DEADBEEF /* AlarmModel.swift */; };
-		B320000500000000DEADBEEF /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310000500000000DEADBEEF /* NotificationManager.swift */; };
 		B320000600000000DEADBEEF /* AlarmScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310000600000000DEADBEEF /* AlarmScheduler.swift */; };
 		B320000700000000DEADBEEF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B310000700000000DEADBEEF /* Assets.xcassets */; };
 		B320000900000000DEADBEEF /* AlarmHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310001100000000DEADBEEF /* AlarmHistoryView.swift */; };
@@ -57,7 +56,6 @@
 		B310000200000000DEADBEEF /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		B310000300000000DEADBEEF /* AddAlarmView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddAlarmView.swift; sourceTree = "<group>"; };
 		B310000400000000DEADBEEF /* AlarmModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmModel.swift; sourceTree = "<group>"; };
-		B310000500000000DEADBEEF /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		B310000600000000DEADBEEF /* AlarmScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmScheduler.swift; sourceTree = "<group>"; };
 		B310000700000000DEADBEEF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B310000800000000DEADBEEF /* AlarmClock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AlarmClock.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -111,7 +109,6 @@
 				B310000200000000DEADBEEF /* ContentView.swift */,
 				B310000300000000DEADBEEF /* AddAlarmView.swift */,
 				B310000400000000DEADBEEF /* AlarmModel.swift */,
-				B310000500000000DEADBEEF /* NotificationManager.swift */,
 				B310000600000000DEADBEEF /* AlarmScheduler.swift */,
 				B310000700000000DEADBEEF /* Assets.xcassets */,
 				B310001100000000DEADBEEF /* AlarmHistoryView.swift */,
@@ -270,7 +267,6 @@
 				B320000200000000DEADBEEF /* ContentView.swift in Sources */,
 				B320000300000000DEADBEEF /* AddAlarmView.swift in Sources */,
 				B320000400000000DEADBEEF /* AlarmModel.swift in Sources */,
-				B320000500000000DEADBEEF /* NotificationManager.swift in Sources */,
 				B320000600000000DEADBEEF /* AlarmScheduler.swift in Sources */,
 				B320000900000000DEADBEEF /* AlarmHistoryView.swift in Sources */,
 				B320001300000000DEADBEEF /* AlarmKitManager.swift in Sources */,

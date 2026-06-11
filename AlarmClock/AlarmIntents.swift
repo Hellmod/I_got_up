@@ -45,9 +45,8 @@ struct StopAlarmIntent: LiveActivityIntent {
         }
 
         // Stopping the alarm starts the wake-up verification cycle:
-        // reminders via notifications, then an AlarmKit re-ring if no response.
-        NotificationManager.shared.cancelWakeUpCheck(for: id)
-        NotificationManager.shared.scheduleWakeUpCheck(for: alarm)
+        // delay phase, response window, then an AlarmKit re-ring if no response.
+        await AlarmKitManager.shared.startWakeUpCheck(for: alarm)
 
         return .result()
     }
@@ -87,7 +86,7 @@ struct SnoozeAlarmIntent: LiveActivityIntent {
 
         // Snoozing means the user is not up yet — any pending wake-up check is
         // stale; a fresh cycle starts when they eventually stop the alarm.
-        NotificationManager.shared.cancelWakeUpCheck(for: id)
+        AlarmKitManager.shared.cancelWakeUpCheck(for: id)
 
         return .result()
     }

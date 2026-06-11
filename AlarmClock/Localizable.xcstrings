@@ -5793,6 +5793,266 @@
           }
         }
       }
+    },
+    "You can confirm in:" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Potwierdzisz za:"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bestätigen möglich in:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Podrás confirmar en:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirmation possible dans :"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Você poderá confirmar em:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подтвердить можно через:"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "確認できるまで："
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "可确认倒计时："
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يمكنك التأكيد بعد:"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "पुष्टि कर सकेंगे:"
+          }
+        }
+      }
+    },
+    "The confirm button unlocks when the countdown ends." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przycisk potwierdzenia odblokuje się po zakończeniu odliczania."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Bestätigen-Knopf wird nach Ablauf des Countdowns freigeschaltet."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El botón de confirmar se desbloquea cuando termina la cuenta atrás."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le bouton de confirmation se débloque à la fin du compte à rebours."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O botão de confirmar é liberado quando a contagem termina."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кнопка подтверждения разблокируется после окончания отсчёта."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カウントダウン終了後に確認ボタンが使えます。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "倒计时结束后确认按钮才会解锁。"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يُفعَّل زر التأكيد عند انتهاء العد التنازلي."
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "काउंटडाउन खत्म होने पर पुष्टि बटन सक्रिय होगा।"
+          }
+        }
+      }
+    },
+    "Alarm will ring again in:" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alarm zadzwoni ponownie za:"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Wecker klingelt erneut in:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La alarma volverá a sonar en:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'alarme resonnera dans :"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O alarme tocará de novo em:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Будильник зазвонит снова через:"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アラームが再び鳴るまで："
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "闹钟将再次响起："
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "سيرن المنبه مجددًا بعد:"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "अलार्म फिर बजेगा:"
+          }
+        }
+      }
+    },
+    "After stopping the alarm, a %lld min delay starts during which you can't confirm yet. Then you have %lld min to confirm you're up — otherwise the alarm rings again." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Po wyłączeniu alarmu zaczyna się %lld min opóźnienia, w trakcie którego nie można jeszcze potwierdzić. Potem masz %lld min na potwierdzenie wstania — inaczej alarm zadzwoni ponownie."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach dem Ausschalten beginnt eine Verzögerung von %lld Min., in der noch nicht bestätigt werden kann. Danach hast du %lld Min. zum Bestätigen — sonst klingelt der Wecker erneut."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tras apagar la alarma comienza un retraso de %lld min durante el cual aún no puedes confirmar. Luego tienes %lld min para confirmar; si no, la alarma vuelve a sonar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Après l'arrêt, un délai de %lld min commence pendant lequel la confirmation est bloquée. Ensuite vous avez %lld min pour confirmer, sinon l'alarme resonne."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Após desligar o alarme, começa um atraso de %lld min em que ainda não dá para confirmar. Depois você tem %lld min para confirmar — senão o alarme toca de novo."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "После выключения начинается задержка %lld мин, во время которой подтвердить нельзя. Затем у тебя %lld мин на подтверждение — иначе будильник зазвонит снова."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アラーム停止後、%lld分の待機時間が始まり、その間は確認できません。その後%lld分以内に確認しないと、アラームが再び鳴ります。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关闭闹钟后开始 %lld 分钟延迟，期间无法确认。之后你有 %lld 分钟确认起床，否则闹钟再次响起。"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "بعد إيقاف المنبه يبدأ تأخير %lld د لا يمكن التأكيد خلاله. بعدها لديك %lld د للتأكيد — وإلا يرن المنبه مجددًا."
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "अलार्म बंद करने के बाद %lld मिनट का विलंब शुरू होता है, जिसमें पुष्टि नहीं की जा सकती। फिर %lld मिनट में पुष्टि करें — वरना अलार्म फिर बजेगा।"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
