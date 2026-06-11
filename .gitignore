@@ -15,6 +15,9 @@ DerivedData/
 .LSOverride
 Thumbs.db
 
+# JetBrains IDEs
+.idea/
+
 # Swift Package Manager
 .build/
 .swiftpm/

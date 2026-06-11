@@ -59,11 +59,21 @@ final class AlarmKitManager: ObservableObject {
         let title = alarm.label.isEmpty ? String(localized: "Alarm \(alarm.timeString)") : alarm.label
         let config = makeConfiguration(for: alarm, schedule: schedule,
                                        firingID: alarm.id, title: title)
+
+        // Clear any stale alarm state under the same id first — a once-alarm
+        // that already fired (and was ignored) lingers in AlarmKit, and
+        // re-scheduling over it fails with the generic Code=0 error.
+        try? await AlarmManager.shared.cancel(id: alarm.id)
+
         do {
             _ = try await AlarmManager.shared.schedule(id: alarm.id, configuration: config)
             print("✅ AlarmKit scheduled [\(alarm.id)] \(alarm.timeString)")
         } catch {
-            print("❌ AlarmKit schedule failed: \(error)")
+            print("""
+            ❌ AlarmKit schedule failed [\(alarm.id)] \(alarm.timeString) \
+            repeat=\(alarm.repeatSchedule.displayText) sound=\(alarm.soundName) \
+            snooze=\(alarm.snoozeEnabled) wakeCheck=\(alarm.wakeUpCheckEnabled): \(error)
+            """)
         }
     }
 
