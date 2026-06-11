@@ -207,16 +207,6 @@ struct AlarmRow: View {
                         }
                     }
                 }
-
-                if alarm.wakeUpCheckEnabled {
-                    HStack(spacing: 4) {
-                        Image(systemName: "checkmark.circle")
-                            .font(.caption)
-                        Text("Wake-Up Check \(alarm.wakeUpCheckDelay) min", comment: "Badge in alarm row")
-                            .font(.caption)
-                    }
-                    .foregroundStyle(.blue.opacity(0.8))
-                }
             }
 
             Spacer()
