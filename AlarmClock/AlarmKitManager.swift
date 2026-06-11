@@ -87,9 +87,11 @@ final class AlarmKitManager: ObservableObject {
 
         let baseName = alarm.label.isEmpty ? String(localized: "Alarm") : alarm.label
         let title = String(localized: "\(baseName) — no response!")
-        let fireDate = Date().addingTimeInterval(seconds)
-        let config = makeConfiguration(for: alarm, schedule: .fixed(fireDate),
-                                       firingID: reRingID, title: title)
+        // Countdown timer instead of a fixed date: the system shows a live
+        // ticking countdown until the re-ring fires.
+        let config = makeConfiguration(for: alarm, schedule: nil,
+                                       firingID: reRingID, title: title,
+                                       preAlert: seconds)
         do {
             _ = try await AlarmManager.shared.schedule(id: reRingID, configuration: config)
             print("✅ AlarmKit re-ring in \(Int(seconds))s [\(reRingID)]")
@@ -104,15 +106,24 @@ final class AlarmKitManager: ObservableObject {
         Task { try? await AlarmManager.shared.cancel(id: reRingID) }
     }
 
+    /// Alarms whose wake-up check cycle is currently running (countdown ticking).
+    func alarmIDsWithPendingReRing() -> [UUID] {
+        let map = (UserDefaults.standard.dictionary(forKey: reRingMapKey) as? [String: String]) ?? [:]
+        return map.keys.compactMap(UUID.init(uuidString:))
+    }
+
     // MARK: - Configuration builders
 
     // Note: our own `Alarm` model shadows AlarmKit's `Alarm` type, so AlarmKit's
     // nested types must be written fully qualified (AlarmKit.Alarm.…).
+    /// `preAlert` turns the alarm into a countdown timer: the system shows a
+    /// live ticking countdown (Lock Screen / Dynamic Island) until it alerts.
     private func makeConfiguration(
         for alarm: Alarm,
-        schedule: AlarmKit.Alarm.Schedule,
+        schedule: AlarmKit.Alarm.Schedule?,
         firingID: UUID,
-        title: String
+        title: String,
+        preAlert: TimeInterval? = nil
     ) -> AlarmManager.AlarmConfiguration<EmptyMetadata> {
         let stopButton = AlarmButton(
             text: "Stop",
@@ -137,16 +148,30 @@ final class AlarmKitManager: ObservableObject {
                 stopButton: stopButton)
         }
 
+        let presentation: AlarmPresentation
+        if preAlert != nil {
+            let countdown = AlarmPresentation.Countdown(
+                title: "Time left to confirm you're up",
+                pauseButton: nil)
+            presentation = AlarmPresentation(alert: alert, countdown: countdown)
+        } else {
+            presentation = AlarmPresentation(alert: alert)
+        }
+
         let attributes = AlarmAttributes<EmptyMetadata>(
-            presentation: AlarmPresentation(alert: alert),
+            presentation: presentation,
             tintColor: .orange)
 
+        let postAlert: TimeInterval? = alarm.snoozeEnabled
+            ? TimeInterval(alarm.snoozeDuration * 60)
+            : nil
+        let countdownDuration: AlarmKit.Alarm.CountdownDuration? =
+            (preAlert == nil && postAlert == nil)
+                ? nil
+                : AlarmKit.Alarm.CountdownDuration(preAlert: preAlert, postAlert: postAlert)
+
         return AlarmManager.AlarmConfiguration(
-            countdownDuration: alarm.snoozeEnabled
-                ? AlarmKit.Alarm.CountdownDuration(
-                    preAlert: nil,
-                    postAlert: TimeInterval(alarm.snoozeDuration * 60))
-                : nil,
+            countdownDuration: countdownDuration,
             schedule: schedule,
             attributes: attributes,
             stopIntent: StopAlarmIntent(alarmID: alarm.id.uuidString,

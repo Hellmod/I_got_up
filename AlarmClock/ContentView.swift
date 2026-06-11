@@ -82,6 +82,13 @@ struct ContentView: View {
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
             store.reload()
             historyStore.reload()
+            // Wake-up check countdown is running (user tapped the Live Activity
+            // or just opened the app) — ask for confirmation directly.
+            if notificationManager.pendingWakeUpAlarm == nil,
+               let id = AlarmKitManager.shared.alarmIDsWithPendingReRing().first,
+               let alarm = store.alarms.first(where: { $0.id == id }) {
+                notificationManager.pendingWakeUpAlarm = alarm
+            }
         }
     }
 

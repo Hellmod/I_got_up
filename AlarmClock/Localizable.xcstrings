@@ -879,6 +879,18 @@
       "ar" : { "stringUnit" : { "state" : "translated", "value" : "تم" } },
       "hi" : { "stringUnit" : { "state" : "translated", "value" : "हो गया" } }
     } },
+    "Time left to confirm you're up" : { "extractionState" : "manual", "localizations" : {
+      "pl" : { "stringUnit" : { "state" : "translated", "value" : "Czas na potwierdzenie wstania" } },
+      "de" : { "stringUnit" : { "state" : "translated", "value" : "Zeit zur Bestätigung, dass du wach bist" } },
+      "es" : { "stringUnit" : { "state" : "translated", "value" : "Tiempo para confirmar que te levantaste" } },
+      "fr" : { "stringUnit" : { "state" : "translated", "value" : "Temps pour confirmer que vous êtes levé" } },
+      "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Tempo para confirmar que você levantou" } },
+      "ru" : { "stringUnit" : { "state" : "translated", "value" : "Время подтвердить, что ты встал" } },
+      "ja" : { "stringUnit" : { "state" : "translated", "value" : "起床確認の残り時間" } },
+      "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "确认起床剩余时间" } },
+      "ar" : { "stringUnit" : { "state" : "translated", "value" : "الوقت المتبقي لتأكيد الاستيقاظ" } },
+      "hi" : { "stringUnit" : { "state" : "translated", "value" : "उठने की पुष्टि का शेष समय" } }
+    } },
     "Volume follows the system ringtone volume." : { "extractionState" : "manual", "localizations" : {
       "pl" : { "stringUnit" : { "state" : "translated", "value" : "Głośność alarmu odpowiada systemowej głośności dzwonka." } },
       "de" : { "stringUnit" : { "state" : "translated", "value" : "Die Lautstärke entspricht der System-Klingeltonlautstärke." } },

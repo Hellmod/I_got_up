@@ -6,6 +6,8 @@
 	<string>Wstałem!</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<key>NSAlarmKitUsageDescription</key>
 	<string>Aplikacja potrzebuje uprawnień do alarmów, aby budzik mógł dzwonić o ustawionej godzinie.</string>
 </dict>
