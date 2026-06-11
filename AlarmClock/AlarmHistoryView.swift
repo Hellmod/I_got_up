@@ -8,13 +8,28 @@ struct AlarmHistoryView: View {
 
     var body: some View {
         NavigationStack {
-            Group {
+            List {
+                Section {
+                    Toggle("Record history", isOn: $historyStore.isEnabled)
+                } footer: {
+                    Text("When disabled, new alarm events won't be saved to history.")
+                }
+
                 if historyStore.entries.isEmpty {
-                    emptyState
+                    Section {
+                        emptyState
+                            .frame(maxWidth: .infinity)
+                            .listRowBackground(Color.clear)
+                    }
                 } else {
-                    entryList
+                    Section {
+                        ForEach(historyStore.entries) { entry in
+                            HistoryEntryRow(entry: entry)
+                        }
+                    }
                 }
             }
+            .listStyle(.insetGrouped)
             .navigationTitle("Alarm History")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
@@ -42,28 +57,19 @@ struct AlarmHistoryView: View {
     // MARK: - Subviews
 
     private var emptyState: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 12) {
             Image(systemName: "clock.arrow.circlepath")
-                .font(.system(size: 56))
+                .font(.system(size: 44))
                 .foregroundStyle(.secondary)
             Text("No History")
-                .font(.title2)
+                .font(.title3)
                 .fontWeight(.semibold)
             Text("Alarm activity will appear here")
+                .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding()
-    }
-
-    private var entryList: some View {
-        List {
-            ForEach(historyStore.entries) { entry in
-                HistoryEntryRow(entry: entry)
-            }
-        }
-        .listStyle(.insetGrouped)
+        .padding(.vertical, 24)
     }
 }
 

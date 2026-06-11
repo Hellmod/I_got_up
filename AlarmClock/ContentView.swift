@@ -13,6 +13,7 @@ struct ContentView: View {
     @State private var showPermissionAlert = false
     @State private var showHistory = false
     @State private var showOnboarding = false
+    @State private var showNotificationInfo = false
     @AppStorage("onboarding_seen_v1") private var onboardingSeen = false
 
     var body: some View {
@@ -46,7 +47,7 @@ struct ContentView: View {
                 }
                 ToolbarItem(placement: .secondaryAction) {
                     Button {
-                        openNotificationSettings()
+                        showNotificationInfo = true
                     } label: {
                         Label("Notification Settings", systemImage: "bell.badge")
                     }
@@ -74,6 +75,12 @@ struct ContentView: View {
             }
             .onAppear {
                 if !onboardingSeen { showOnboarding = true }
+            }
+            .alert("Notification Settings", isPresented: $showNotificationInfo) {
+                Button("Open Settings") { openNotificationSettings() }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("This is optional — alarms will ring either way. We recommend it for Wake-Up Check: set the banner style to Persistent so the reminder stays on screen until you respond, and keep notification sounds enabled.")
             }
             .alert("No Permission", isPresented: $showPermissionAlert) {
                 Button("Settings") { openSettings() }

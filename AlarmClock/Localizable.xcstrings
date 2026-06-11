@@ -5533,6 +5533,266 @@
           }
         }
       }
+    },
+    "Record history" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zapisuj historię"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verlauf aufzeichnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar historial"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrer l'historique"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salvar histórico"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вести историю"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴を記録"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "记录历史"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تسجيل السجل"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "इतिहास सहेजें"
+          }
+        }
+      }
+    },
+    "When disabled, new alarm events won't be saved to history." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Po wyłączeniu nowe zdarzenia budzika nie będą zapisywane w historii."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn deaktiviert, werden neue Wecker-Ereignisse nicht im Verlauf gespeichert."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si está desactivado, los nuevos eventos de la alarma no se guardarán en el historial."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si désactivé, les nouveaux événements d'alarme ne seront pas enregistrés."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quando desativado, novos eventos do alarme não serão salvos no histórico."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Если выключено, новые события будильника не сохраняются в истории."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オフにすると、新しいアラームの記録は保存されません。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关闭后，新的闹钟事件将不会保存到历史记录。"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عند الإيقاف، لن تُحفظ أحداث المنبه الجديدة في السجل."
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "बंद करने पर अलार्म की नई घटनाएं इतिहास में सहेजी नहीं जाएंगी।"
+          }
+        }
+      }
+    },
+    "Open Settings" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwórz Ustawienia"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellungen öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir Ajustes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir Réglages"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir Ajustes"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть настройки"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定を開く"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开设置"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "فتح الإعدادات"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "सेटिंग्स खोलें"
+          }
+        }
+      }
+    },
+    "This is optional — alarms will ring either way. We recommend it for Wake-Up Check: set the banner style to Persistent so the reminder stays on screen until you respond, and keep notification sounds enabled." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To opcjonalne — alarmy zadzwonią tak czy inaczej. Polecamy dla Wake-Up Check: ustaw styl banera na Trwałe, aby przypomnienie zostało na ekranie do czasu odpowiedzi, i zostaw włączone dźwięki powiadomień."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das ist optional — Wecker klingeln auch ohne. Empfohlen für den Wake-Up Check: Stelle den Bannerstil auf „Dauerhaft\", damit die Erinnerung bis zu deiner Antwort sichtbar bleibt, und lasse Mitteilungstöne aktiviert."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es opcional: las alarmas sonarán de todos modos. Lo recomendamos para Wake-Up Check: configura el estilo de tira como Persistente para que el recordatorio permanezca en pantalla hasta que respondas y mantén los sonidos activados."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "C'est facultatif — les alarmes sonneront de toute façon. Recommandé pour le Wake-Up Check : réglez le style de bannière sur Persistant pour que le rappel reste affiché jusqu'à votre réponse, et laissez les sons activés."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "É opcional — os alarmes tocarão de qualquer forma. Recomendamos para o Wake-Up Check: defina o estilo do banner como Persistente para o lembrete ficar na tela até você responder e mantenha os sons ativados."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Это необязательно — будильники зазвонят в любом случае. Рекомендуем для Wake-Up Check: установите стиль баннера «Постоянно», чтобы напоминание оставалось на экране до ответа, и оставьте звуки уведомлений включёнными."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "これは任意です。アラームはいずれにせよ鳴ります。Wake-Up Checkのために、バナースタイルを「持続的」に設定するとリマインダーが応答まで画面に残ります。通知音もオンのままにしてください。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这是可选的——闹钟无论如何都会响。建议为 Wake-Up Check 设置：将横幅样式设为「持久」，提醒会一直显示直到你响应，并保持通知声音开启。"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هذا اختياري — سيرن المنبه على أي حال. ننصح به من أجل Wake-Up Check: اضبط نمط الإشعار على «مستمر» ليبقى التذكير على الشاشة حتى ترد، وأبقِ أصوات الإشعارات مفعّلة."
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "यह वैकल्पिक है — अलार्म वैसे भी बजेगा। Wake-Up Check के लिए सुझाव: बैनर शैली को स्थायी पर सेट करें ताकि रिमाइंडर आपके जवाब देने तक स्क्रीन पर रहे, और सूचना ध्वनि चालू रखें।"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

@@ -221,12 +221,23 @@ struct AlarmHistoryEntry: Identifiable, Codable {
 
 class AlarmHistoryStore: ObservableObject {
     @Published var entries: [AlarmHistoryEntry] = []
+    /// When false, record() is a no-op. Persisted so background intents
+    /// (which create fresh store instances) respect the user's choice.
+    @Published var isEnabled: Bool {
+        didSet { UserDefaults.standard.set(isEnabled, forKey: enabledKey) }
+    }
+
     private let key = "alarm_history_v1"
+    private let enabledKey = "alarm_history_enabled"
     private let maxEntries = 200
 
-    init() { load() }
+    init() {
+        isEnabled = (UserDefaults.standard.object(forKey: enabledKey) as? Bool) ?? true
+        load()
+    }
 
     func record(alarm: Alarm, action: HistoryAction, detail: String? = nil) {
+        guard isEnabled else { return }
         let entry = AlarmHistoryEntry(
             alarmID: alarm.id,
             alarmLabel: alarm.label,
