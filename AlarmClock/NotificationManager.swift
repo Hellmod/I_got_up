@@ -82,12 +82,12 @@ class NotificationManager: NSObject, ObservableObject, UNUserNotificationCenterD
     private func registerCategories() {
         let confirmAction = UNNotificationAction(
             identifier: NotificationAction.wakeConfirm,
-            title: "✅ Tak, wstałem",
+            title: String(localized: "✅ Yes, I'm up"),
             options: [.foreground]
         )
         let wakeSnoozeAction = UNNotificationAction(
             identifier: NotificationAction.wakeSnooze,
-            title: "😴 Jeszcze nie",
+            title: String(localized: "😴 Not yet"),
             options: []
         )
         let wakeUpCategory = UNNotificationCategory(
@@ -113,13 +113,13 @@ class NotificationManager: NSObject, ObservableObject, UNUserNotificationCenterD
         for i in 0..<count {
             let content = UNMutableNotificationContent()
             if i == 0 {
-                content.title = "Hej, czy już wstajesz? 👋"
+                content.title = String(localized: "Hey, are you getting up? 👋")
             } else if i == count - 1 {
-                content.title = "Ostatnie przypomnienie! ⚠️ (\(i + 1)/\(count))"
+                content.title = String(localized: "Last reminder! ⚠️ (\(i + 1)/\(count))")
             } else {
-                content.title = "Wstawaj! 👋 (\(i + 1)/\(count))"
+                content.title = String(localized: "Get up! 👋 (\(i + 1)/\(count))")
             }
-            content.body = "Potwierdź że wstałeś — lub alarm zaraz zadzwoni ponownie."
+            content.body = String(localized: "Confirm you're up — or the alarm will ring again soon.")
             content.sound = .default
             content.categoryIdentifier = NotificationCategory.wakeUpCheck
             content.userInfo = ["alarmID": alarm.id.uuidString]

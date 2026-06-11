@@ -15,26 +15,26 @@ struct AlarmHistoryView: View {
                     entryList
                 }
             }
-            .navigationTitle("Historia budzika")
+            .navigationTitle("Alarm History")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 if !historyStore.entries.isEmpty {
                     ToolbarItem(placement: .destructiveAction) {
-                        Button("Wyczyść", role: .destructive) {
+                        Button("Clear", role: .destructive) {
                             showClearConfirm = true
                         }
                     }
                 }
             }
             .confirmationDialog(
-                "Wyczyścić historię?",
+                "Clear history?",
                 isPresented: $showClearConfirm,
                 titleVisibility: .visible
             ) {
-                Button("Wyczyść historię", role: .destructive) {
+                Button("Clear History", role: .destructive) {
                     historyStore.clear()
                 }
-                Button("Anuluj", role: .cancel) {}
+                Button("Cancel", role: .cancel) {}
             }
         }
     }
@@ -46,10 +46,10 @@ struct AlarmHistoryView: View {
             Image(systemName: "clock.arrow.circlepath")
                 .font(.system(size: 56))
                 .foregroundStyle(.secondary)
-            Text("Brak historii")
+            Text("No History")
                 .font(.title2)
                 .fontWeight(.semibold)
-            Text("Tutaj pojawi się historia działania budzika")
+            Text("Alarm activity will appear here")
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
         }

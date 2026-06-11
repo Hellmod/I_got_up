@@ -22,7 +22,7 @@ struct ContentView: View {
                     alarmList
                 }
             }
-            .navigationTitle("Budzik")
+            .navigationTitle("Alarms")
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button {
@@ -39,14 +39,14 @@ struct ContentView: View {
                     Button {
                         showHistory = true
                     } label: {
-                        Label("Historia", systemImage: "clock.arrow.circlepath")
+                        Label("History", systemImage: "clock.arrow.circlepath")
                     }
                 }
                 ToolbarItem(placement: .secondaryAction) {
                     Button {
                         openNotificationSettings()
                     } label: {
-                        Label("Ustawienia powiadomień", systemImage: "bell.badge")
+                        Label("Notification Settings", systemImage: "bell.badge")
                     }
                 }
             }
@@ -60,11 +60,11 @@ struct ContentView: View {
                 AlarmHistoryView()
                     .environmentObject(historyStore)
             }
-            .alert("Brak uprawnień", isPresented: $showPermissionAlert) {
-                Button("Ustawienia") { openSettings() }
-                Button("Anuluj", role: .cancel) {}
+            .alert("No Permission", isPresented: $showPermissionAlert) {
+                Button("Settings") { openSettings() }
+                Button("Cancel", role: .cancel) {}
             } message: {
-                Text("Aby alarmy działały, włącz powiadomienia dla tej aplikacji w Ustawieniach.")
+                Text("To make alarms work, enable notifications for this app in Settings.")
             }
             .overlay(permissionBanner, alignment: .top)
         }
@@ -92,10 +92,10 @@ struct ContentView: View {
             Image(systemName: "alarm")
                 .font(.system(size: 64))
                 .foregroundStyle(.secondary)
-            Text("Brak alarmów")
+            Text("No Alarms")
                 .font(.title2)
                 .fontWeight(.semibold)
-            Text("Dotknij + aby dodać nowy alarm")
+            Text("Tap + to add a new alarm")
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -114,7 +114,7 @@ struct ContentView: View {
                         Button(role: .destructive) {
                             AlarmScheduler.shared.alarmDeleted(alarm, store: store)
                         } label: {
-                            Label("Usuń", systemImage: "trash")
+                            Label("Delete", systemImage: "trash")
                         }
                     }
             }
@@ -127,18 +127,18 @@ struct ContentView: View {
         VStack(spacing: 8) {
             if alarmKit.permissionDenied {
                 banner(icon: "alarm.waves.left.and.right",
-                       title: "Brak uprawnień do alarmów",
-                       message: "Budzik nie zadzwoni — włącz alarmy w Ustawieniach.")
+                       title: "Alarms permission missing",
+                       message: "The alarm won't ring — enable alarms in Settings.")
             }
             if notificationManager.permissionDenied {
                 banner(icon: "bell.slash.fill",
-                       title: "Powiadomienia wyłączone",
-                       message: "Wake-Up Check nie będzie działać bez uprawnień.")
+                       title: "Notifications disabled",
+                       message: "Wake-Up Check won't work without permission.")
             }
         }
     }
 
-    private func banner(icon: String, title: String, message: String) -> some View {
+    private func banner(icon: String, title: LocalizedStringKey, message: LocalizedStringKey) -> some View {
         HStack {
             Image(systemName: icon)
                 .foregroundStyle(.white)
@@ -152,7 +152,7 @@ struct ContentView: View {
                     .foregroundStyle(.white.opacity(0.85))
             }
             Spacer()
-            Button("Włącz") { openSettings() }
+            Button("Enable") { openSettings() }
                 .font(.subheadline)
                 .fontWeight(.semibold)
                 .padding(.horizontal, 12)
@@ -220,7 +220,7 @@ struct AlarmRow: View {
                     HStack(spacing: 4) {
                         Image(systemName: "checkmark.circle")
                             .font(.caption)
-                        Text("Wake-Up Check \(alarm.wakeUpCheckDelay) min")
+                        Text("Wake-Up Check \(alarm.wakeUpCheckDelay) min", comment: "Badge in alarm row")
                             .font(.caption)
                     }
                     .foregroundStyle(.blue.opacity(0.8))

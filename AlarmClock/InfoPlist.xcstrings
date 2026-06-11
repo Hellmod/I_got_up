@@ -1,0 +1,19 @@
+{
+  "sourceLanguage" : "en",
+  "version" : "1.0",
+  "strings" : {
+    "NSAlarmKitUsageDescription" : { "extractionState" : "manual", "localizations" : {
+      "en" : { "stringUnit" : { "state" : "translated", "value" : "The app needs alarm permission so the alarm clock can ring at the scheduled time." } },
+      "pl" : { "stringUnit" : { "state" : "translated", "value" : "Aplikacja potrzebuje uprawnień do alarmów, aby budzik mógł dzwonić o ustawionej godzinie." } },
+      "de" : { "stringUnit" : { "state" : "translated", "value" : "Die App benötigt die Wecker-Berechtigung, damit der Wecker zur eingestellten Zeit klingeln kann." } },
+      "es" : { "stringUnit" : { "state" : "translated", "value" : "La app necesita el permiso de alarmas para que el despertador pueda sonar a la hora programada." } },
+      "fr" : { "stringUnit" : { "state" : "translated", "value" : "L'app a besoin de l'autorisation d'alarmes pour que le réveil sonne à l'heure prévue." } },
+      "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "O app precisa da permissão de alarmes para que o despertador toque no horário marcado." } },
+      "ru" : { "stringUnit" : { "state" : "translated", "value" : "Приложению нужно разрешение на будильники, чтобы он мог звонить в назначенное время." } },
+      "ja" : { "stringUnit" : { "state" : "translated", "value" : "設定した時刻にアラームを鳴らすには、アラームの権限が必要です。" } },
+      "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "应用需要闹钟权限，以便在设定时间响铃。" } },
+      "ar" : { "stringUnit" : { "state" : "translated", "value" : "يحتاج التطبيق إلى إذن المنبهات ليتمكن المنبه من الرنين في الوقت المحدد." } },
+      "hi" : { "stringUnit" : { "state" : "translated", "value" : "निर्धारित समय पर अलार्म बजाने के लिए ऐप को अलार्म की अनुमति चाहिए।" } }
+    } }
+  }
+}

@@ -4,14 +4,14 @@ import Foundation
 
 // MARK: - StopAlarmIntent
 //
-// Runs when the user taps "Wyłącz" on the system alarm screen. The system
+// Runs when the user taps "Stop" on the system alarm screen. The system
 // launches the app in the background to perform it — works from killed state.
 //
 // alarmID  = the Alarm in our store (business logic)
 // firingID = the AlarmKit alarm that is ringing (main alarm or re-ring)
 
 struct StopAlarmIntent: LiveActivityIntent {
-    static var title: LocalizedStringResource = "Wyłącz alarm"
+    static var title: LocalizedStringResource = "Stop alarm"
 
     @Parameter(title: "alarmID") var alarmID: String
     @Parameter(title: "firingID") var firingID: String
@@ -59,7 +59,7 @@ struct StopAlarmIntent: LiveActivityIntent {
 // alarm into its countdown state — the system re-fires it after snoozeDuration.
 
 struct SnoozeAlarmIntent: LiveActivityIntent {
-    static var title: LocalizedStringResource = "Drzemka"
+    static var title: LocalizedStringResource = "Snooze"
 
     @Parameter(title: "alarmID") var alarmID: String
     @Parameter(title: "firingID") var firingID: String
@@ -83,7 +83,7 @@ struct SnoozeAlarmIntent: LiveActivityIntent {
         }
 
         AlarmHistoryStore().record(alarm: alarm, action: .snoozed,
-                                   detail: "\(alarm.snoozeDuration) min")
+                                   detail: String(localized: "\(alarm.snoozeDuration) min"))
 
         // Snoozing means the user is not up yet — any pending wake-up check is
         // stale; a fresh cycle starts when they eventually stop the alarm.

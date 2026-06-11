@@ -24,13 +24,13 @@ struct WakeUpCheckView: View {
                         .font(.system(size: 64))
                         .foregroundStyle(.yellow)
 
-                    Text("Czy już wstałeś?")
+                    Text("Are you up yet?")
                         .font(.largeTitle)
                         .fontWeight(.bold)
                         .foregroundStyle(.white)
 
                     VStack(spacing: 4) {
-                        Text("Budzik \(alarm.timeString)")
+                        Text("Alarm \(alarm.timeString)")
                             .font(.title3)
                             .foregroundStyle(.white.opacity(0.6))
                         if !alarm.label.isEmpty {
@@ -40,7 +40,7 @@ struct WakeUpCheckView: View {
                         }
                     }
 
-                    Text("Potwierdź, że nie śpisz — inaczej alarm zadzwoni ponownie.")
+                    Text("Confirm you're awake — otherwise the alarm will ring again.")
                         .font(.subheadline)
                         .foregroundStyle(.white.opacity(0.5))
                         .multilineTextAlignment(.center)
@@ -51,7 +51,7 @@ struct WakeUpCheckView: View {
 
                 VStack(spacing: 14) {
                     Button(action: confirm) {
-                        Label("Tak, wstałem", systemImage: "checkmark.circle.fill")
+                        Label("Yes, I'm up", systemImage: "checkmark.circle.fill")
                             .font(.headline)
                             .fontWeight(.semibold)
                             .frame(maxWidth: .infinity)
@@ -62,7 +62,7 @@ struct WakeUpCheckView: View {
                     }
 
                     Button(action: postpone) {
-                        Label("Jeszcze nie — alarm za 5 min", systemImage: "moon.zzz.fill")
+                        Label("Not yet — alarm in 5 min", systemImage: "moon.zzz.fill")
                             .font(.subheadline)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 16)

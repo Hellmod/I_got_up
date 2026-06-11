@@ -8,16 +8,9 @@ enum Weekday: Int, Codable, CaseIterable, Identifiable {
 
     var id: Int { rawValue }
 
+    /// Localized short weekday name from the system calendar (e.g. "Mon", "pon.").
     var shortName: String {
-        switch self {
-        case .sunday: return "Nd"
-        case .monday: return "Pn"
-        case .tuesday: return "Wt"
-        case .wednesday: return "Śr"
-        case .thursday: return "Cz"
-        case .friday: return "Pt"
-        case .saturday: return "So"
-        }
+        Calendar.current.shortStandaloneWeekdaySymbols[rawValue - 1]
     }
 
     var calendarWeekday: Int { rawValue }
@@ -45,11 +38,11 @@ enum AlarmRepeat: Codable, Equatable {
     var displayText: String {
         switch self {
         case .once:
-            return "Jednorazowo"
+            return String(localized: "Once")
         case .weekdays(let days):
-            if days.count == 7 { return "Codziennie" }
-            if days == Set([.monday, .tuesday, .wednesday, .thursday, .friday]) { return "Dni robocze" }
-            if days == Set([.saturday, .sunday]) { return "Weekendy" }
+            if days.count == 7 { return String(localized: "Every day") }
+            if days == Set([.monday, .tuesday, .wednesday, .thursday, .friday]) { return String(localized: "Weekdays") }
+            if days == Set([.saturday, .sunday]) { return String(localized: "Weekends") }
             return days.sorted { $0.rawValue < $1.rawValue }.map(\.shortName).joined(separator: ", ")
         }
     }
@@ -105,11 +98,11 @@ struct Alarm: Identifiable, Codable {
         if hours >= 24 {
             let days = hours / 24
             let h = hours % 24
-            return h > 0 ? "Za \(days) d \(h) godz" : "Za \(days) d"
+            return h > 0 ? String(localized: "In \(days) d \(h) h") : String(localized: "In \(days) d")
         }
-        if hours > 0 { return "Za \(hours) godz \(minutes) min" }
-        if minutes > 0 { return "Za \(minutes) min" }
-        return "Za chwilę"
+        if hours > 0 { return String(localized: "In \(hours) h \(minutes) min") }
+        if minutes > 0 { return String(localized: "In \(minutes) min") }
+        return String(localized: "Soon")
     }
 }
 
@@ -160,11 +153,11 @@ enum HistoryAction: String, Codable {
 
     var label: String {
         switch self {
-        case .dismissed:    return "Wyłączony"
-        case .snoozed:      return "Drzemka"
-        case .wakeConfirmed: return "Wstałem ✅"
-        case .wakePostponed: return "Jeszcze nie 😴"
-        case .autoReRing:   return "Ponowny alarm"
+        case .dismissed:    return String(localized: "Dismissed")
+        case .snoozed:      return String(localized: "Snoozed")
+        case .wakeConfirmed: return String(localized: "I'm up ✅")
+        case .wakePostponed: return String(localized: "Not yet 😴")
+        case .autoReRing:   return String(localized: "Re-ring")
         }
     }
 

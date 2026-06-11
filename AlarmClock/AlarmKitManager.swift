@@ -12,7 +12,7 @@ struct EmptyMetadata: AlarmMetadata {}
 // break through silent mode and Focus, and fire even when the app is killed.
 //
 // The system alarm screen shows two buttons:
-//   • "Wyłącz"  → StopAlarmIntent  → records history + starts Wake-Up Check
+//   • "Stop"   → StopAlarmIntent   → records history + starts Wake-Up Check
 //   • "Drzemka" → SnoozeAlarmIntent → system countdown re-fires the alarm
 
 final class AlarmKitManager: ObservableObject {
@@ -58,7 +58,7 @@ final class AlarmKitManager: ObservableObject {
         guard await requestAuthorizationIfNeeded() else { return }
         guard let schedule = makeSchedule(for: alarm) else { return }
 
-        let title = alarm.label.isEmpty ? "Budzik \(alarm.timeString)" : alarm.label
+        let title = alarm.label.isEmpty ? String(localized: "Alarm \(alarm.timeString)") : alarm.label
         let config = makeConfiguration(for: alarm, schedule: schedule,
                                        firingID: alarm.id, title: title)
         do {
@@ -85,7 +85,8 @@ final class AlarmKitManager: ObservableObject {
         let reRingID = UUID()
         saveReRingID(reRingID, for: alarm.id)
 
-        let title = "\(alarm.label.isEmpty ? "Budzik" : alarm.label) — brak odpowiedzi!"
+        let baseName = alarm.label.isEmpty ? String(localized: "Alarm") : alarm.label
+        let title = String(localized: "\(baseName) — no response!")
         let fireDate = Date().addingTimeInterval(seconds)
         let config = makeConfiguration(for: alarm, schedule: .fixed(fireDate),
                                        firingID: reRingID, title: title)
@@ -114,11 +115,11 @@ final class AlarmKitManager: ObservableObject {
         title: String
     ) -> AlarmManager.AlarmConfiguration<EmptyMetadata> {
         let stopButton = AlarmButton(
-            text: "Wyłącz",
+            text: "Stop",
             textColor: .white,
             systemImageName: "stop.circle")
         let snoozeButton = AlarmButton(
-            text: "Drzemka",
+            text: "Snooze",
             textColor: .white,
             systemImageName: "moon.zzz.fill")
 

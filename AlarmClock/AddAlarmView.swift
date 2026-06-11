@@ -50,7 +50,7 @@ struct AddAlarmView: View {
                 // Time picker
                 Section {
                     DatePicker(
-                        "Godzina alarmu",
+                        "Alarm time",
                         selection: $selectedTime,
                         displayedComponents: .hourAndMinute
                     )
@@ -60,13 +60,13 @@ struct AddAlarmView: View {
                 }
 
                 // Label
-                Section("Etykieta") {
-                    TextField("Opcjonalna nazwa alarmu", text: $label)
+                Section("Label") {
+                    TextField("Optional alarm name", text: $label)
                 }
 
                 // Repeat
-                Section("Powtarzanie") {
-                    repeatRow(title: "Jednorazowo", isSelected: isOnce) {
+                Section("Repeat") {
+                    repeatRow(title: String(localized: "Once"), isSelected: isOnce) {
                         repeatSchedule = .once
                         selectedWeekdays = []
                     }
@@ -75,12 +75,12 @@ struct AddAlarmView: View {
                     }
                 }
 
-                // Snooze — used by the system alarm's "Drzemka" button
-                Section("Drzemka") {
-                    Picker("Czas drzemki", selection: $snoozeDuration) {
-                        Text("5 minut").tag(5)
-                        Text("10 minut").tag(10)
-                        Text("15 minut").tag(15)
+                // Snooze — used by the system alarm's snooze button
+                Section("Snooze") {
+                    Picker("Snooze duration", selection: $snoozeDuration) {
+                        Text("5 min").tag(5)
+                        Text("10 min").tag(10)
+                        Text("15 min").tag(15)
                     }
                 }
 
@@ -90,32 +90,32 @@ struct AddAlarmView: View {
 
                     if wakeUpCheckEnabled {
                         Stepper(
-                            "Opóźnienie: \(wakeUpCheckDelay) min",
+                            "Delay: \(wakeUpCheckDelay) min",
                             value: $wakeUpCheckDelay,
                             in: 1...10
                         )
                         Stepper(
-                            "Alarm po braku odpowiedzi: \(wakeUpNoResponseTime) min",
+                            "Re-ring after no response: \(wakeUpNoResponseTime) min",
                             value: $wakeUpNoResponseTime,
                             in: 1...15
                         )
                     }
                 } header: {
-                    Text("Weryfikacja obudzenia")
+                    Text("Wake-up verification")
                 } footer: {
                     if wakeUpCheckEnabled {
-                        Text("Po wyłączeniu alarmu, po \(wakeUpCheckDelay) min. zostanie wysłane powiadomienie z prośbą o potwierdzenie. Brak odpowiedzi przez \(wakeUpNoResponseTime) min. = ponowny dzwonek.")
+                        Text("After dismissing the alarm, a confirmation request arrives after \(wakeUpCheckDelay) min. No response for \(wakeUpNoResponseTime) min — the alarm rings again.")
                     }
                 }
             }
-            .navigationTitle(editingAlarm == nil ? "Nowy alarm" : "Edytuj alarm")
+            .navigationTitle(editingAlarm == nil ? Text("New Alarm") : Text("Edit Alarm"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Anuluj") { dismiss() }
+                    Button("Cancel") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Zapisz") { save() }
+                    Button("Save") { save() }
                         .fontWeight(.semibold)
                 }
             }
