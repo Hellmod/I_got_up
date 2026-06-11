@@ -6,6 +6,7 @@ struct ContentView: View {
     @EnvironmentObject private var store: AlarmStore
     @EnvironmentObject private var notificationManager: NotificationManager
     @EnvironmentObject private var historyStore: AlarmHistoryStore
+    @EnvironmentObject private var alarmKit: AlarmKitManager
 
     @State private var showAddAlarm = false
     @State private var alarmToEdit: Alarm?
@@ -67,23 +68,9 @@ struct ContentView: View {
             }
             .overlay(permissionBanner, alignment: .top)
         }
-        // Full-screen alarm UI shown when alarm fires while app is in foreground.
-        .fullScreenCover(item: Binding(
-            get: { notificationManager.firingAlarm },
-            set: { notificationManager.firingAlarm = $0 }
-        )) { alarm in
-            AlarmActiveView(alarm: alarm)
-                .environmentObject(notificationManager)
-                .environmentObject(store)
-                .environmentObject(historyStore)
-        }
-        // Reload state when app returns from background — once-alarms that fired get
-        // marked disabled from notification handler, we need to reflect that in the UI.
-        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)) { _ in
-            BackgroundAlarmService.shared.startMonitoring()
-        }
+        // Reload state when app returns to foreground — alarms stopped, snoozed or
+        // disabled by intents while we were in background must show up in the UI.
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
-            BackgroundAlarmService.shared.stopMonitoring()
             store.reload()
             historyStore.reload()
         }
@@ -128,36 +115,49 @@ struct ContentView: View {
 
     @ViewBuilder
     private var permissionBanner: some View {
-        if notificationManager.permissionDenied {
-            HStack {
-                Image(systemName: "bell.slash.fill")
-                    .foregroundStyle(.white)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Powiadomienia wyłączone")
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(.white)
-                    Text("Alarmy nie będą działać bez uprawnień.")
-                        .font(.caption)
-                        .foregroundStyle(.white.opacity(0.85))
-                }
-                Spacer()
-                Button("Włącz") { openSettings() }
+        VStack(spacing: 8) {
+            if alarmKit.permissionDenied {
+                banner(icon: "alarm.waves.left.and.right",
+                       title: "Brak uprawnień do alarmów",
+                       message: "Budzik nie zadzwoni — włącz alarmy w Ustawieniach.")
+            }
+            if notificationManager.permissionDenied {
+                banner(icon: "bell.slash.fill",
+                       title: "Powiadomienia wyłączone",
+                       message: "Wake-Up Check nie będzie działać bez uprawnień.")
+            }
+        }
+    }
+
+    private func banner(icon: String, title: String, message: String) -> some View {
+        HStack {
+            Image(systemName: icon)
+                .foregroundStyle(.white)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
                     .font(.subheadline)
                     .fontWeight(.semibold)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(.white.opacity(0.25))
-                    .clipShape(Capsule())
                     .foregroundStyle(.white)
+                Text(message)
+                    .font(.caption)
+                    .foregroundStyle(.white.opacity(0.85))
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
-            .background(Color.red)
-            .cornerRadius(12)
-            .padding(.horizontal, 16)
-            .padding(.top, 8)
+            Spacer()
+            Button("Włącz") { openSettings() }
+                .font(.subheadline)
+                .fontWeight(.semibold)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(.white.opacity(0.25))
+                .clipShape(Capsule())
+                .foregroundStyle(.white)
         }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(Color.red)
+        .cornerRadius(12)
+        .padding(.horizontal, 16)
+        .padding(.top, 8)
     }
 
     private func openSettings() {
@@ -241,4 +241,5 @@ struct AlarmRow: View {
         .environmentObject(store)
         .environmentObject(NotificationManager.shared)
         .environmentObject(AlarmHistoryStore())
+        .environmentObject(AlarmKitManager.shared)
 }

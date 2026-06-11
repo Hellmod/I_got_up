@@ -1,25 +1,24 @@
 import Foundation
-import UserNotifications
 
 // MARK: - AlarmScheduler
 
-/// Coordinates between AlarmStore and NotificationManager — single point of truth
+/// Coordinates between AlarmStore and AlarmKitManager — single point of truth
 /// for enabling/disabling alarms.
 class AlarmScheduler {
 
     static let shared = AlarmScheduler()
-    private let nm = NotificationManager.shared
 
     private init() {}
 
-    /// Enable an alarm: schedule its notification(s).
+    /// Enable an alarm: schedule it in AlarmKit.
     func enable(_ alarm: Alarm) {
-        nm.scheduleAlarm(alarm)
+        Task { await AlarmKitManager.shared.schedule(alarm) }
     }
 
-    /// Disable an alarm: cancel all pending notifications for it.
+    /// Disable an alarm: cancel the AlarmKit alarm and any pending wake-up check.
     func disable(_ alarm: Alarm) {
-        nm.cancelAlarm(alarm)
+        AlarmKitManager.shared.cancel(alarm.id)
+        NotificationManager.shared.cancelWakeUpCheck(for: alarm.id)
     }
 
     /// Toggle alarm on/off and update the store.
@@ -43,7 +42,7 @@ class AlarmScheduler {
 
     /// Call after editing an existing alarm.
     func alarmUpdated(_ alarm: Alarm, store: AlarmStore) {
-        disable(alarm) // remove old schedule
+        AlarmKitManager.shared.cancel(alarm.id) // remove old schedule
         store.update(alarm)
         if alarm.isEnabled {
             enable(alarm)
@@ -56,19 +55,13 @@ class AlarmScheduler {
         store.delete(alarm)
     }
 
-    /// Re-schedule all enabled alarms (e.g. on app launch after notification permission granted).
+    /// Ensure all enabled alarms are scheduled in AlarmKit (e.g. on app launch).
+    /// Scheduling with the same id overwrites, so this is safe to call repeatedly.
+    /// Disabled alarms are left untouched so a pending wake-up check cycle for a
+    /// just-fired once-alarm isn't cancelled by merely opening the app.
     func rescheduleAll(from store: AlarmStore) {
-        for alarm in store.alarms {
-            disable(alarm)
-            if alarm.isEnabled {
-                enable(alarm)
-            }
+        for alarm in store.alarms where alarm.isEnabled {
+            enable(alarm)
         }
-    }
-
-    // MARK: - Debug helpers
-
-    func listPending(completion: @escaping ([UNNotificationRequest]) -> Void) {
-        UNUserNotificationCenter.current().getPendingNotificationRequests(completionHandler: completion)
     }
 }

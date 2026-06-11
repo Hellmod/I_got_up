@@ -14,11 +14,9 @@
 		B320000500000000DEADBEEF /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310000500000000DEADBEEF /* NotificationManager.swift */; };
 		B320000600000000DEADBEEF /* AlarmScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310000600000000DEADBEEF /* AlarmScheduler.swift */; };
 		B320000700000000DEADBEEF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B310000700000000DEADBEEF /* Assets.xcassets */; };
-		B320000800000000DEADBEEF /* AlarmActiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310001000000000DEADBEEF /* AlarmActiveView.swift */; };
 		B320000900000000DEADBEEF /* AlarmHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310001100000000DEADBEEF /* AlarmHistoryView.swift */; };
-		B320001000000000DEADBEEF /* BackgroundAlarmService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310001200000000DEADBEEF /* BackgroundAlarmService.swift */; };
-		B320001100000000DEADBEEF /* AlarmSoundGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310001300000000DEADBEEF /* AlarmSoundGenerator.swift */; };
-		B320001200000000DEADBEEF /* AlarmCallManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310001400000000DEADBEEF /* AlarmCallManager.swift */; };
+		B320001300000000DEADBEEF /* AlarmKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310001500000000DEADBEEF /* AlarmKitManager.swift */; };
+		B320001400000000DEADBEEF /* AlarmIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310001600000000DEADBEEF /* AlarmIntents.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,11 +29,9 @@
 		B310000700000000DEADBEEF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B310000800000000DEADBEEF /* AlarmClock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AlarmClock.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B310000900000000DEADBEEF /* AlarmClock.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AlarmClock.entitlements; sourceTree = "<group>"; };
-		B310001000000000DEADBEEF /* AlarmActiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmActiveView.swift; sourceTree = "<group>"; };
 		B310001100000000DEADBEEF /* AlarmHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmHistoryView.swift; sourceTree = "<group>"; };
-		B310001200000000DEADBEEF /* BackgroundAlarmService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundAlarmService.swift; sourceTree = "<group>"; };
-		B310001300000000DEADBEEF /* AlarmSoundGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmSoundGenerator.swift; sourceTree = "<group>"; };
-		B310001400000000DEADBEEF /* AlarmCallManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmCallManager.swift; sourceTree = "<group>"; };
+		B310001500000000DEADBEEF /* AlarmKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmKitManager.swift; sourceTree = "<group>"; };
+		B310001600000000DEADBEEF /* AlarmIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmIntents.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,11 +63,9 @@
 				B310000500000000DEADBEEF /* NotificationManager.swift */,
 				B310000600000000DEADBEEF /* AlarmScheduler.swift */,
 				B310000700000000DEADBEEF /* Assets.xcassets */,
-				B310001000000000DEADBEEF /* AlarmActiveView.swift */,
 				B310001100000000DEADBEEF /* AlarmHistoryView.swift */,
-				B310001200000000DEADBEEF /* BackgroundAlarmService.swift */,
-				B310001300000000DEADBEEF /* AlarmSoundGenerator.swift */,
-				B310001400000000DEADBEEF /* AlarmCallManager.swift */,
+				B310001500000000DEADBEEF /* AlarmKitManager.swift */,
+				B310001600000000DEADBEEF /* AlarmIntents.swift */,
 				B310000900000000DEADBEEF /* AlarmClock.entitlements */,
 			);
 			path = AlarmClock;
@@ -161,11 +155,9 @@
 				B320000400000000DEADBEEF /* AlarmModel.swift in Sources */,
 				B320000500000000DEADBEEF /* NotificationManager.swift in Sources */,
 				B320000600000000DEADBEEF /* AlarmScheduler.swift in Sources */,
-				B320000800000000DEADBEEF /* AlarmActiveView.swift in Sources */,
 				B320000900000000DEADBEEF /* AlarmHistoryView.swift in Sources */,
-				B320001000000000DEADBEEF /* BackgroundAlarmService.swift in Sources */,
-				B320001100000000DEADBEEF /* AlarmSoundGenerator.swift in Sources */,
-				B320001200000000DEADBEEF /* AlarmCallManager.swift in Sources */,
+				B320001300000000DEADBEEF /* AlarmKitManager.swift in Sources */,
+				B320001400000000DEADBEEF /* AlarmIntents.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -224,7 +216,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -280,7 +272,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -298,7 +290,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 4LCAH5J7V4;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIBackgroundModes = audio;
+				INFOPLIST_KEY_NSAlarmKitUsageDescription = "Aplikacja potrzebuje uprawnien do alarmow, aby budzik mogl dzwonic o ustawionej godzinie.";
 				INFOPLIST_KEY_NSUserNotificationsUsageDescription = "Aplikacja potrzebuje uprawnien do wysylania powiadomien, aby alarmy dzialaly nawet gdy aplikacja jest zamknieta.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -328,7 +320,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 4LCAH5J7V4;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIBackgroundModes = audio;
+				INFOPLIST_KEY_NSAlarmKitUsageDescription = "Aplikacja potrzebuje uprawnien do alarmow, aby budzik mogl dzwonic o ustawionej godzinie.";
 				INFOPLIST_KEY_NSUserNotificationsUsageDescription = "Aplikacja potrzebuje uprawnien do wysylania powiadomien, aby alarmy dzialaly nawet gdy aplikacja jest zamknieta.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

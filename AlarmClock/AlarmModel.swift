@@ -21,6 +21,19 @@ enum Weekday: Int, Codable, CaseIterable, Identifiable {
     }
 
     var calendarWeekday: Int { rawValue }
+
+    /// Mapping for AlarmKit's weekly recurrence.
+    var localeWeekday: Locale.Weekday {
+        switch self {
+        case .sunday: return .sunday
+        case .monday: return .monday
+        case .tuesday: return .tuesday
+        case .wednesday: return .wednesday
+        case .thursday: return .thursday
+        case .friday: return .friday
+        case .saturday: return .saturday
+        }
+    }
 }
 
 // MARK: - AlarmRepeat
@@ -233,24 +246,3 @@ class AlarmHistoryStore: ObservableObject {
         entries = decoded
     }
 }
-
-// MARK: - Available Sounds
-
-struct AlarmSound: Identifiable, Hashable {
-    let id: String
-    let displayName: String
-    var fileName: String?
-}
-
-let availableSounds: [AlarmSound] = [
-    AlarmSound(id: "default", displayName: "Domyślny", fileName: nil),
-    AlarmSound(id: "alarm", displayName: "Alarm", fileName: "alarm.caf"),
-    AlarmSound(id: "anticipate", displayName: "Anticipate", fileName: "Anticipate.caf"),
-    AlarmSound(id: "bloom", displayName: "Bloom", fileName: "Bloom.caf"),
-    AlarmSound(id: "calypso", displayName: "Calypso", fileName: "Calypso.caf"),
-    AlarmSound(id: "chime", displayName: "Dzwonki", fileName: "Chime.caf"),
-    AlarmSound(id: "chord", displayName: "Akord", fileName: "Chord.caf"),
-    AlarmSound(id: "fanfare", displayName: "Fanfara", fileName: "Fanfare.caf"),
-    AlarmSound(id: "spell", displayName: "Spell", fileName: "Spell.caf"),
-    AlarmSound(id: "suspense", displayName: "Suspense", fileName: "Suspense.caf"),
-]

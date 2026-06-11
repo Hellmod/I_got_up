@@ -1,5 +1,4 @@
 import SwiftUI
-import AudioToolbox
 
 // MARK: - AddAlarmView
 
@@ -12,13 +11,11 @@ struct AddAlarmView: View {
     @State private var selectedTime: Date
     @State private var label: String
     @State private var repeatSchedule: AlarmRepeat
-    @State private var selectedSound: String
     @State private var snoozeDuration: Int
     @State private var wakeUpCheckEnabled: Bool
     @State private var wakeUpCheckDelay: Int
     @State private var wakeUpNoResponseTime: Int
 
-    @State private var showSoundPicker = false
     @State private var selectedWeekdays: Set<Weekday>
 
     init(editingAlarm: Alarm? = nil) {
@@ -33,7 +30,6 @@ struct AddAlarmView: View {
 
         _selectedTime = State(initialValue: date)
         _label = State(initialValue: alarm?.label ?? "")
-        _selectedSound = State(initialValue: alarm?.soundName ?? "default")
         _snoozeDuration = State(initialValue: alarm?.snoozeDuration ?? 5)
         _wakeUpCheckEnabled = State(initialValue: alarm?.wakeUpCheckEnabled ?? true)
         _wakeUpCheckDelay = State(initialValue: alarm?.wakeUpCheckDelay ?? 3)
@@ -79,24 +75,9 @@ struct AddAlarmView: View {
                     }
                 }
 
-                // Sound
-                Section("Dźwięk") {
-                    Button {
-                        showSoundPicker = true
-                    } label: {
-                        HStack {
-                            Text("Dźwięk alarmu")
-                                .foregroundStyle(.primary)
-                            Spacer()
-                            Text(availableSounds.first(where: { $0.id == selectedSound })?.displayName ?? "Domyślny")
-                                .foregroundStyle(.secondary)
-                            Image(systemName: "chevron.right")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-
-                    Picker("Drzemka", selection: $snoozeDuration) {
+                // Snooze — used by the system alarm's "Drzemka" button
+                Section("Drzemka") {
+                    Picker("Czas drzemki", selection: $snoozeDuration) {
                         Text("5 minut").tag(5)
                         Text("10 minut").tag(10)
                         Text("15 minut").tag(15)
@@ -137,9 +118,6 @@ struct AddAlarmView: View {
                     Button("Zapisz") { save() }
                         .fontWeight(.semibold)
                 }
-            }
-            .sheet(isPresented: $showSoundPicker) {
-                SoundPickerView(selectedSound: $selectedSound)
             }
         }
     }
@@ -209,7 +187,6 @@ struct AddAlarmView: View {
             label: label.trimmingCharacters(in: .whitespaces),
             isEnabled: editingAlarm?.isEnabled ?? true,
             repeatSchedule: schedule,
-            soundName: selectedSound,
             snoozeDuration: snoozeDuration,
             wakeUpCheckEnabled: wakeUpCheckEnabled,
             wakeUpCheckDelay: wakeUpCheckDelay,
@@ -222,48 +199,6 @@ struct AddAlarmView: View {
             AlarmScheduler.shared.alarmAdded(alarm, store: store)
         }
         dismiss()
-    }
-}
-
-// MARK: - SoundPickerView
-
-struct SoundPickerView: View {
-    @Binding var selectedSound: String
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        NavigationStack {
-            List(availableSounds) { sound in
-                Button {
-                    selectedSound = sound.id
-                    previewSound()
-                } label: {
-                    HStack {
-                        Text(sound.displayName)
-                            .foregroundStyle(.primary)
-                        Spacer()
-                        if selectedSound == sound.id {
-                            Image(systemName: "checkmark")
-                                .foregroundStyle(.blue)
-                        }
-                        Image(systemName: "play.circle")
-                            .foregroundStyle(.secondary)
-                    }
-                }
-            }
-            .navigationTitle("Wybierz dźwięk")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Gotowe") { dismiss() }
-                }
-            }
-        }
-    }
-
-    private func previewSound() {
-        // Sound ID 1005 = system alarm sound. Plays a short preview on tap.
-        AudioServicesPlayAlertSound(SystemSoundID(1005))
     }
 }
 

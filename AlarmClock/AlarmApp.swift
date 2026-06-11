@@ -6,12 +6,11 @@ struct AlarmApp: App {
     @StateObject private var store = AlarmStore()
     @StateObject private var historyStore = AlarmHistoryStore()
     @StateObject private var notificationManager = NotificationManager.shared
+    @StateObject private var alarmKitManager = AlarmKitManager.shared
 
     init() {
+        // Register wake-up check categories and clean up legacy notification alarms.
         NotificationManager.shared.setup()
-        // Generate the custom 29-second alarm tone used by UNNotificationSound.
-        // No-op if the file already exists from a previous launch.
-        AlarmSoundGenerator.ensureAlarmSound()
     }
 
     var body: some Scene {
@@ -20,8 +19,14 @@ struct AlarmApp: App {
                 .environmentObject(store)
                 .environmentObject(historyStore)
                 .environmentObject(notificationManager)
+                .environmentObject(alarmKitManager)
                 .task {
                     await requestPermissionIfNeeded()
+                    // Ask for the AlarmKit permission, then make sure every
+                    // enabled alarm is scheduled as a real system alarm.
+                    if await AlarmKitManager.shared.requestAuthorizationIfNeeded() {
+                        AlarmScheduler.shared.rescheduleAll(from: store)
+                    }
                 }
         }
     }
