@@ -20,6 +20,7 @@
 		B320001500000000DEADBEEF /* WakeUpCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310001800000000DEADBEEF /* WakeUpCheckView.swift */; };
 		B320001600000000DEADBEEF /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B310001900000000DEADBEEF /* Localizable.xcstrings */; };
 		B320001700000000DEADBEEF /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B310002000000000DEADBEEF /* InfoPlist.xcstrings */; };
+		B320001800000000DEADBEEF /* AlarmToneGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310002100000000DEADBEEF /* AlarmToneGenerator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -39,6 +40,7 @@
 		B310001800000000DEADBEEF /* WakeUpCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WakeUpCheckView.swift; sourceTree = "<group>"; };
 		B310001900000000DEADBEEF /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		B310002000000000DEADBEEF /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
+		B310002100000000DEADBEEF /* AlarmToneGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmToneGenerator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,6 +76,7 @@
 				B310001500000000DEADBEEF /* AlarmKitManager.swift */,
 				B310001600000000DEADBEEF /* AlarmIntents.swift */,
 				B310001800000000DEADBEEF /* WakeUpCheckView.swift */,
+				B310002100000000DEADBEEF /* AlarmToneGenerator.swift */,
 				B310001900000000DEADBEEF /* Localizable.xcstrings */,
 				B310002000000000DEADBEEF /* InfoPlist.xcstrings */,
 				B310001700000000DEADBEEF /* Info.plist */,
@@ -181,6 +184,7 @@
 				B320001300000000DEADBEEF /* AlarmKitManager.swift in Sources */,
 				B320001400000000DEADBEEF /* AlarmIntents.swift in Sources */,
 				B320001500000000DEADBEEF /* WakeUpCheckView.swift in Sources */,
+				B320001800000000DEADBEEF /* AlarmToneGenerator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,3 +1,4 @@
+import AVFoundation
 import SwiftUI
 
 // MARK: - AddAlarmView
@@ -11,11 +12,14 @@ struct AddAlarmView: View {
     @State private var selectedTime: Date
     @State private var label: String
     @State private var repeatSchedule: AlarmRepeat
+    @State private var selectedSound: String
+    @State private var snoozeEnabled: Bool
     @State private var snoozeDuration: Int
     @State private var wakeUpCheckEnabled: Bool
     @State private var wakeUpCheckDelay: Int
     @State private var wakeUpNoResponseTime: Int
 
+    @State private var showSoundPicker = false
     @State private var selectedWeekdays: Set<Weekday>
 
     init(editingAlarm: Alarm? = nil) {
@@ -30,6 +34,8 @@ struct AddAlarmView: View {
 
         _selectedTime = State(initialValue: date)
         _label = State(initialValue: alarm?.label ?? "")
+        _selectedSound = State(initialValue: alarm?.soundName ?? "default")
+        _snoozeEnabled = State(initialValue: alarm?.snoozeEnabled ?? true)
         _snoozeDuration = State(initialValue: alarm?.snoozeDuration ?? 5)
         _wakeUpCheckEnabled = State(initialValue: alarm?.wakeUpCheckEnabled ?? true)
         _wakeUpCheckDelay = State(initialValue: alarm?.wakeUpCheckDelay ?? 3)
@@ -75,12 +81,37 @@ struct AddAlarmView: View {
                     }
                 }
 
-                // Snooze — used by the system alarm's snooze button
+                // Sound — volume itself always follows the system ringer
+                Section {
+                    Button {
+                        showSoundPicker = true
+                    } label: {
+                        HStack {
+                            Text("Alarm sound")
+                                .foregroundStyle(.primary)
+                            Spacer()
+                            Text(availableSounds.first(where: { $0.id == selectedSound })?.displayName ?? "")
+                                .foregroundStyle(.secondary)
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                } header: {
+                    Text("Sound")
+                } footer: {
+                    Text("Volume follows the system ringtone volume.")
+                }
+
+                // Snooze — when disabled the system alarm shows only a Stop button
                 Section("Snooze") {
-                    Picker("Snooze duration", selection: $snoozeDuration) {
-                        Text("5 min").tag(5)
-                        Text("10 min").tag(10)
-                        Text("15 min").tag(15)
+                    Toggle("Snooze", isOn: $snoozeEnabled)
+                    if snoozeEnabled {
+                        Picker("Snooze duration", selection: $snoozeDuration) {
+                            Text("5 min").tag(5)
+                            Text("10 min").tag(10)
+                            Text("15 min").tag(15)
+                        }
                     }
                 }
 
@@ -118,6 +149,9 @@ struct AddAlarmView: View {
                     Button("Save") { save() }
                         .fontWeight(.semibold)
                 }
+            }
+            .sheet(isPresented: $showSoundPicker) {
+                SoundPickerView(selectedSound: $selectedSound)
             }
         }
     }
@@ -187,6 +221,8 @@ struct AddAlarmView: View {
             label: label.trimmingCharacters(in: .whitespaces),
             isEnabled: editingAlarm?.isEnabled ?? true,
             repeatSchedule: schedule,
+            soundName: selectedSound,
+            snoozeEnabled: snoozeEnabled,
             snoozeDuration: snoozeDuration,
             wakeUpCheckEnabled: wakeUpCheckEnabled,
             wakeUpCheckDelay: wakeUpCheckDelay,
@@ -199,6 +235,56 @@ struct AddAlarmView: View {
             AlarmScheduler.shared.alarmAdded(alarm, store: store)
         }
         dismiss()
+    }
+}
+
+// MARK: - SoundPickerView
+
+struct SoundPickerView: View {
+    @Binding var selectedSound: String
+    @Environment(\.dismiss) private var dismiss
+    @State private var player: AVAudioPlayer?
+
+    var body: some View {
+        NavigationStack {
+            List(availableSounds) { sound in
+                Button {
+                    selectedSound = sound.id
+                    preview(sound)
+                } label: {
+                    HStack {
+                        Text(sound.displayName)
+                            .foregroundStyle(.primary)
+                        Spacer()
+                        if selectedSound == sound.id {
+                            Image(systemName: "checkmark")
+                                .foregroundStyle(.blue)
+                        }
+                        Image(systemName: "play.circle")
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+            .navigationTitle("Choose sound")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Done") { dismiss() }
+                }
+            }
+            .onDisappear { player?.stop() }
+        }
+    }
+
+    private func preview(_ sound: AlarmSound) {
+        player?.stop()
+        guard let fileName = sound.fileName,
+              let url = AlarmToneGenerator.fileURL(for: fileName) else {
+            player = nil
+            return // system default has no local file to preview
+        }
+        player = try? AVAudioPlayer(contentsOf: url)
+        player?.play()
     }
 }
 

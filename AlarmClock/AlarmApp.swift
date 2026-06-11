@@ -11,6 +11,8 @@ struct AlarmApp: App {
     init() {
         // Register wake-up check categories and clean up legacy notification alarms.
         NotificationManager.shared.setup()
+        // Synthesize the alarm tone files used by the sound picker and AlarmKit.
+        AlarmToneGenerator.ensureSounds()
     }
 
     var body: some Scene {

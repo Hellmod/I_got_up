@@ -118,32 +118,50 @@ final class AlarmKitManager: ObservableObject {
             text: "Stop",
             textColor: .white,
             systemImageName: "stop.circle")
-        let snoozeButton = AlarmButton(
-            text: "Snooze",
-            textColor: .white,
-            systemImageName: "moon.zzz.fill")
 
-        let alert = AlarmPresentation.Alert(
-            title: LocalizedStringResource(stringLiteral: title),
-            stopButton: stopButton,
-            secondaryButton: snoozeButton,
-            secondaryButtonBehavior: .custom)
+        // No-snooze alarms show only the Stop button on the system alarm screen.
+        let alert: AlarmPresentation.Alert
+        if alarm.snoozeEnabled {
+            let snoozeButton = AlarmButton(
+                text: "Snooze",
+                textColor: .white,
+                systemImageName: "moon.zzz.fill")
+            alert = AlarmPresentation.Alert(
+                title: LocalizedStringResource(stringLiteral: title),
+                stopButton: stopButton,
+                secondaryButton: snoozeButton,
+                secondaryButtonBehavior: .custom)
+        } else {
+            alert = AlarmPresentation.Alert(
+                title: LocalizedStringResource(stringLiteral: title),
+                stopButton: stopButton)
+        }
 
         let attributes = AlarmAttributes<EmptyMetadata>(
             presentation: AlarmPresentation(alert: alert),
             tintColor: .orange)
 
         return AlarmManager.AlarmConfiguration(
-            countdownDuration: AlarmKit.Alarm.CountdownDuration(
-                preAlert: nil,
-                postAlert: TimeInterval(alarm.snoozeDuration * 60)),
+            countdownDuration: alarm.snoozeEnabled
+                ? AlarmKit.Alarm.CountdownDuration(
+                    preAlert: nil,
+                    postAlert: TimeInterval(alarm.snoozeDuration * 60))
+                : nil,
             schedule: schedule,
             attributes: attributes,
             stopIntent: StopAlarmIntent(alarmID: alarm.id.uuidString,
                                         firingID: firingID.uuidString),
-            secondaryIntent: SnoozeAlarmIntent(alarmID: alarm.id.uuidString,
-                                               firingID: firingID.uuidString),
-            sound: .default)
+            secondaryIntent: alarm.snoozeEnabled
+                ? SnoozeAlarmIntent(alarmID: alarm.id.uuidString,
+                                    firingID: firingID.uuidString)
+                : nil,
+            sound: soundFile(for: alarm).map { .named($0) } ?? .default)
+    }
+
+    /// File name of the custom tone, or nil for the system default sound.
+    /// Volume is not configurable — alarms play at the system ringer volume.
+    private func soundFile(for alarm: Alarm) -> String? {
+        availableSounds.first(where: { $0.id == alarm.soundName })?.fileName
     }
 
     private func makeSchedule(for alarm: Alarm) -> AlarmKit.Alarm.Schedule? {

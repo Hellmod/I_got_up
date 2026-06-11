@@ -58,6 +58,7 @@ struct Alarm: Identifiable, Codable {
     var isEnabled: Bool = true
     var repeatSchedule: AlarmRepeat = .once
     var soundName: String = "default"
+    var snoozeEnabled: Bool = true
     var snoozeDuration: Int = 5
     var wakeUpCheckEnabled: Bool = true
     var wakeUpCheckDelay: Int = 3       // minutes after dismissal before first check
@@ -103,6 +104,27 @@ struct Alarm: Identifiable, Codable {
         if hours > 0 { return String(localized: "In \(hours) h \(minutes) min") }
         if minutes > 0 { return String(localized: "In \(minutes) min") }
         return String(localized: "Soon")
+    }
+}
+
+// Tolerant decoding: every field falls back to its default when the key is
+// missing, so alarms saved by older app versions survive model additions.
+// (Defined in an extension so the memberwise initializer stays synthesized.)
+extension Alarm {
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        hour = try c.decodeIfPresent(Int.self, forKey: .hour) ?? 7
+        minute = try c.decodeIfPresent(Int.self, forKey: .minute) ?? 0
+        label = try c.decodeIfPresent(String.self, forKey: .label) ?? ""
+        isEnabled = try c.decodeIfPresent(Bool.self, forKey: .isEnabled) ?? true
+        repeatSchedule = try c.decodeIfPresent(AlarmRepeat.self, forKey: .repeatSchedule) ?? .once
+        soundName = try c.decodeIfPresent(String.self, forKey: .soundName) ?? "default"
+        snoozeEnabled = try c.decodeIfPresent(Bool.self, forKey: .snoozeEnabled) ?? true
+        snoozeDuration = try c.decodeIfPresent(Int.self, forKey: .snoozeDuration) ?? 5
+        wakeUpCheckEnabled = try c.decodeIfPresent(Bool.self, forKey: .wakeUpCheckEnabled) ?? true
+        wakeUpCheckDelay = try c.decodeIfPresent(Int.self, forKey: .wakeUpCheckDelay) ?? 3
+        wakeUpNoResponseTime = try c.decodeIfPresent(Int.self, forKey: .wakeUpNoResponseTime) ?? 3
     }
 }
 
@@ -239,3 +261,33 @@ class AlarmHistoryStore: ObservableObject {
         entries = decoded
     }
 }
+
+// MARK: - Alarm sounds
+// Synthesized tones generated into Library/Sounds by AlarmToneGenerator;
+// AlarmKit plays them via AlertConfiguration.AlertSound.named(_:).
+
+struct AlarmSound: Identifiable, Hashable {
+    let id: String          // stored in Alarm.soundName
+    let fileName: String?   // nil = system default sound
+
+    var displayName: String {
+        switch id {
+        case "default": return String(localized: "Default")
+        case "classic": return "Classic"
+        case "digital": return "Digital"
+        case "gentle":  return "Gentle"
+        case "sonar":   return "Sonar"
+        case "bell":    return "Bell"
+        default: return id
+        }
+    }
+}
+
+let availableSounds: [AlarmSound] = [
+    AlarmSound(id: "default", fileName: nil),
+    AlarmSound(id: "classic", fileName: "tone_classic.wav"),
+    AlarmSound(id: "digital", fileName: "tone_digital.wav"),
+    AlarmSound(id: "gentle",  fileName: "tone_gentle.wav"),
+    AlarmSound(id: "sonar",   fileName: "tone_sonar.wav"),
+    AlarmSound(id: "bell",    fileName: "tone_bell.wav"),
+]

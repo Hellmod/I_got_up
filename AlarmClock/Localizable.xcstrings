@@ -818,6 +818,78 @@
       "ar" : { "stringUnit" : { "state" : "translated", "value" : "إيقاف المنبه" } },
       "hi" : { "stringUnit" : { "state" : "translated", "value" : "अलार्म बंद करें" } }
     } },
-    "Wake-Up Check" : { "extractionState" : "manual", "localizations" : { } }
+    "Wake-Up Check" : { "extractionState" : "manual", "localizations" : { } },
+    "Sound" : { "extractionState" : "manual", "localizations" : {
+      "pl" : { "stringUnit" : { "state" : "translated", "value" : "Dźwięk" } },
+      "de" : { "stringUnit" : { "state" : "translated", "value" : "Ton" } },
+      "es" : { "stringUnit" : { "state" : "translated", "value" : "Sonido" } },
+      "fr" : { "stringUnit" : { "state" : "translated", "value" : "Son" } },
+      "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Som" } },
+      "ru" : { "stringUnit" : { "state" : "translated", "value" : "Звук" } },
+      "ja" : { "stringUnit" : { "state" : "translated", "value" : "サウンド" } },
+      "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "声音" } },
+      "ar" : { "stringUnit" : { "state" : "translated", "value" : "الصوت" } },
+      "hi" : { "stringUnit" : { "state" : "translated", "value" : "ध्वनि" } }
+    } },
+    "Alarm sound" : { "extractionState" : "manual", "localizations" : {
+      "pl" : { "stringUnit" : { "state" : "translated", "value" : "Dźwięk alarmu" } },
+      "de" : { "stringUnit" : { "state" : "translated", "value" : "Weckton" } },
+      "es" : { "stringUnit" : { "state" : "translated", "value" : "Sonido de alarma" } },
+      "fr" : { "stringUnit" : { "state" : "translated", "value" : "Son de l'alarme" } },
+      "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Som do alarme" } },
+      "ru" : { "stringUnit" : { "state" : "translated", "value" : "Звук будильника" } },
+      "ja" : { "stringUnit" : { "state" : "translated", "value" : "アラーム音" } },
+      "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "闹钟声音" } },
+      "ar" : { "stringUnit" : { "state" : "translated", "value" : "صوت المنبه" } },
+      "hi" : { "stringUnit" : { "state" : "translated", "value" : "अलार्म ध्वनि" } }
+    } },
+    "Default" : { "extractionState" : "manual", "localizations" : {
+      "pl" : { "stringUnit" : { "state" : "translated", "value" : "Domyślny" } },
+      "de" : { "stringUnit" : { "state" : "translated", "value" : "Standard" } },
+      "es" : { "stringUnit" : { "state" : "translated", "value" : "Predeterminado" } },
+      "fr" : { "stringUnit" : { "state" : "translated", "value" : "Par défaut" } },
+      "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Padrão" } },
+      "ru" : { "stringUnit" : { "state" : "translated", "value" : "Стандартный" } },
+      "ja" : { "stringUnit" : { "state" : "translated", "value" : "デフォルト" } },
+      "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "默认" } },
+      "ar" : { "stringUnit" : { "state" : "translated", "value" : "افتراضي" } },
+      "hi" : { "stringUnit" : { "state" : "translated", "value" : "डिफ़ॉल्ट" } }
+    } },
+    "Choose sound" : { "extractionState" : "manual", "localizations" : {
+      "pl" : { "stringUnit" : { "state" : "translated", "value" : "Wybierz dźwięk" } },
+      "de" : { "stringUnit" : { "state" : "translated", "value" : "Ton auswählen" } },
+      "es" : { "stringUnit" : { "state" : "translated", "value" : "Elegir sonido" } },
+      "fr" : { "stringUnit" : { "state" : "translated", "value" : "Choisir un son" } },
+      "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Escolher som" } },
+      "ru" : { "stringUnit" : { "state" : "translated", "value" : "Выбрать звук" } },
+      "ja" : { "stringUnit" : { "state" : "translated", "value" : "サウンドを選択" } },
+      "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "选择声音" } },
+      "ar" : { "stringUnit" : { "state" : "translated", "value" : "اختر الصوت" } },
+      "hi" : { "stringUnit" : { "state" : "translated", "value" : "ध्वनि चुनें" } }
+    } },
+    "Done" : { "extractionState" : "manual", "localizations" : {
+      "pl" : { "stringUnit" : { "state" : "translated", "value" : "Gotowe" } },
+      "de" : { "stringUnit" : { "state" : "translated", "value" : "Fertig" } },
+      "es" : { "stringUnit" : { "state" : "translated", "value" : "OK" } },
+      "fr" : { "stringUnit" : { "state" : "translated", "value" : "OK" } },
+      "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "OK" } },
+      "ru" : { "stringUnit" : { "state" : "translated", "value" : "Готово" } },
+      "ja" : { "stringUnit" : { "state" : "translated", "value" : "完了" } },
+      "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "完成" } },
+      "ar" : { "stringUnit" : { "state" : "translated", "value" : "تم" } },
+      "hi" : { "stringUnit" : { "state" : "translated", "value" : "हो गया" } }
+    } },
+    "Volume follows the system ringtone volume." : { "extractionState" : "manual", "localizations" : {
+      "pl" : { "stringUnit" : { "state" : "translated", "value" : "Głośność alarmu odpowiada systemowej głośności dzwonka." } },
+      "de" : { "stringUnit" : { "state" : "translated", "value" : "Die Lautstärke entspricht der System-Klingeltonlautstärke." } },
+      "es" : { "stringUnit" : { "state" : "translated", "value" : "El volumen sigue el volumen del timbre del sistema." } },
+      "fr" : { "stringUnit" : { "state" : "translated", "value" : "Le volume suit le volume de sonnerie du système." } },
+      "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "O volume segue o volume do toque do sistema." } },
+      "ru" : { "stringUnit" : { "state" : "translated", "value" : "Громкость соответствует системной громкости звонка." } },
+      "ja" : { "stringUnit" : { "state" : "translated", "value" : "音量はシステムの着信音量に従います。" } },
+      "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "音量跟随系统铃声音量。" } },
+      "ar" : { "stringUnit" : { "state" : "translated", "value" : "يتبع مستوى الصوت مستوى نغمة النظام." } },
+      "hi" : { "stringUnit" : { "state" : "translated", "value" : "वॉल्यूम सिस्टम रिंगटोन वॉल्यूम के अनुसार होगा।" } }
+    } }
   }
 }
