@@ -99,9 +99,11 @@ final class AlarmKitManager: ObservableObject {
 
     // MARK: - Configuration builders
 
+    // Note: our own `Alarm` model shadows AlarmKit's `Alarm` type, so AlarmKit's
+    // nested types must be written fully qualified (AlarmKit.Alarm.…).
     private func makeConfiguration(
         for alarm: Alarm,
-        schedule: Alarm.Schedule,
+        schedule: AlarmKit.Alarm.Schedule,
         firingID: UUID,
         title: String
     ) -> AlarmManager.AlarmConfiguration<EmptyMetadata> {
@@ -125,7 +127,7 @@ final class AlarmKitManager: ObservableObject {
             tintColor: .orange)
 
         return AlarmManager.AlarmConfiguration(
-            countdownDuration: Alarm.CountdownDuration(
+            countdownDuration: AlarmKit.Alarm.CountdownDuration(
                 preAlert: nil,
                 postAlert: TimeInterval(alarm.snoozeDuration * 60)),
             schedule: schedule,
@@ -137,16 +139,16 @@ final class AlarmKitManager: ObservableObject {
             sound: .default)
     }
 
-    private func makeSchedule(for alarm: Alarm) -> Alarm.Schedule? {
+    private func makeSchedule(for alarm: Alarm) -> AlarmKit.Alarm.Schedule? {
         switch alarm.repeatSchedule {
         case .once:
             guard let next = alarm.nextFireDate() else { return nil }
             return .fixed(next)
         case .weekdays(let days):
-            let time = Alarm.Schedule.Relative.Time(hour: alarm.hour, minute: alarm.minute)
-            let recurrence = Alarm.Schedule.Relative.Recurrence.weekly(
+            let time = AlarmKit.Alarm.Schedule.Relative.Time(hour: alarm.hour, minute: alarm.minute)
+            let recurrence = AlarmKit.Alarm.Schedule.Relative.Recurrence.weekly(
                 days.map(\.localeWeekday))
-            return .relative(Alarm.Schedule.Relative(time: time, repeats: recurrence))
+            return .relative(AlarmKit.Alarm.Schedule.Relative(time: time, repeats: recurrence))
         }
     }
 
