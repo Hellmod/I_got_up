@@ -17,6 +17,7 @@
 		B320000900000000DEADBEEF /* AlarmHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310001100000000DEADBEEF /* AlarmHistoryView.swift */; };
 		B320001300000000DEADBEEF /* AlarmKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310001500000000DEADBEEF /* AlarmKitManager.swift */; };
 		B320001400000000DEADBEEF /* AlarmIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310001600000000DEADBEEF /* AlarmIntents.swift */; };
+		B320001500000000DEADBEEF /* WakeUpCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310001800000000DEADBEEF /* WakeUpCheckView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,6 +34,7 @@
 		B310001500000000DEADBEEF /* AlarmKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmKitManager.swift; sourceTree = "<group>"; };
 		B310001600000000DEADBEEF /* AlarmIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmIntents.swift; sourceTree = "<group>"; };
 		B310001700000000DEADBEEF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B310001800000000DEADBEEF /* WakeUpCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WakeUpCheckView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +69,7 @@
 				B310001100000000DEADBEEF /* AlarmHistoryView.swift */,
 				B310001500000000DEADBEEF /* AlarmKitManager.swift */,
 				B310001600000000DEADBEEF /* AlarmIntents.swift */,
+				B310001800000000DEADBEEF /* WakeUpCheckView.swift */,
 				B310001700000000DEADBEEF /* Info.plist */,
 				B310000900000000DEADBEEF /* AlarmClock.entitlements */,
 			);
@@ -160,6 +163,7 @@
 				B320000900000000DEADBEEF /* AlarmHistoryView.swift in Sources */,
 				B320001300000000DEADBEEF /* AlarmKitManager.swift in Sources */,
 				B320001400000000DEADBEEF /* AlarmIntents.swift in Sources */,
+				B320001500000000DEADBEEF /* WakeUpCheckView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -24,6 +24,9 @@ class NotificationManager: NSObject, ObservableObject, UNUserNotificationCenterD
 
     @Published var permissionGranted: Bool = false
     @Published var permissionDenied: Bool = false
+    /// Set when the user taps a Wake-Up Check notification body —
+    /// ContentView presents WakeUpCheckView full-screen.
+    @Published var pendingWakeUpAlarm: Alarm?
 
     /// Upper bound used when sweeping reminder IDs during cancellation.
     private let maxWakeUpReminders = 30
@@ -177,6 +180,13 @@ class NotificationManager: NSObject, ObservableObject, UNUserNotificationCenterD
         let historyStore = AlarmHistoryStore()
 
         switch response.actionIdentifier {
+
+        // Tap on the notification body — open the in-app confirmation screen
+        // (the long-press actions below remain available too).
+        case UNNotificationDefaultActionIdentifier:
+            if response.notification.request.content.categoryIdentifier == NotificationCategory.wakeUpCheck {
+                DispatchQueue.main.async { self.pendingWakeUpAlarm = alarm }
+            }
 
         case NotificationAction.wakeConfirm:
             historyStore.record(alarm: alarm, action: .wakeConfirmed)

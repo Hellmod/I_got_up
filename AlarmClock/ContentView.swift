@@ -68,6 +68,15 @@ struct ContentView: View {
             }
             .overlay(permissionBanner, alignment: .top)
         }
+        // Confirmation screen opened by tapping a Wake-Up Check notification.
+        .fullScreenCover(item: Binding(
+            get: { notificationManager.pendingWakeUpAlarm },
+            set: { notificationManager.pendingWakeUpAlarm = $0 }
+        )) { alarm in
+            WakeUpCheckView(alarm: alarm)
+                .environmentObject(notificationManager)
+                .environmentObject(historyStore)
+        }
         // Reload state when app returns to foreground — alarms stopped, snoozed or
         // disabled by intents while we were in background must show up in the UI.
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
