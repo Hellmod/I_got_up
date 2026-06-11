@@ -35,7 +35,13 @@ final class AlarmKitManager: ObservableObject {
         case .authorized:
             granted = true
         case .notDetermined:
-            granted = (try? await AlarmManager.shared.requestAuthorization()) == .authorized
+            do {
+                granted = try await AlarmManager.shared.requestAuthorization() == .authorized
+            } catch {
+                // Typical cause: NSAlarmKitUsageDescription missing from Info.plist.
+                print("❌ AlarmKit authorization request failed: \(error)")
+                granted = false
+            }
         case .denied:
             granted = false
         @unknown default:

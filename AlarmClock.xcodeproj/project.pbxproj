@@ -32,6 +32,7 @@
 		B310001100000000DEADBEEF /* AlarmHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmHistoryView.swift; sourceTree = "<group>"; };
 		B310001500000000DEADBEEF /* AlarmKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmKitManager.swift; sourceTree = "<group>"; };
 		B310001600000000DEADBEEF /* AlarmIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmIntents.swift; sourceTree = "<group>"; };
+		B310001700000000DEADBEEF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +67,7 @@
 				B310001100000000DEADBEEF /* AlarmHistoryView.swift */,
 				B310001500000000DEADBEEF /* AlarmKitManager.swift */,
 				B310001600000000DEADBEEF /* AlarmIntents.swift */,
+				B310001700000000DEADBEEF /* Info.plist */,
 				B310000900000000DEADBEEF /* AlarmClock.entitlements */,
 			);
 			path = AlarmClock;
@@ -290,7 +292,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 4LCAH5J7V4;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSAlarmKitUsageDescription = "Aplikacja potrzebuje uprawnien do alarmow, aby budzik mogl dzwonic o ustawionej godzinie.";
+				INFOPLIST_FILE = AlarmClock/Info.plist;
 				INFOPLIST_KEY_NSUserNotificationsUsageDescription = "Aplikacja potrzebuje uprawnien do wysylania powiadomien, aby alarmy dzialaly nawet gdy aplikacja jest zamknieta.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -320,7 +322,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 4LCAH5J7V4;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSAlarmKitUsageDescription = "Aplikacja potrzebuje uprawnien do alarmow, aby budzik mogl dzwonic o ustawionej godzinie.";
+				INFOPLIST_FILE = AlarmClock/Info.plist;
 				INFOPLIST_KEY_NSUserNotificationsUsageDescription = "Aplikacja potrzebuje uprawnien do wysylania powiadomien, aby alarmy dzialaly nawet gdy aplikacja jest zamknieta.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
