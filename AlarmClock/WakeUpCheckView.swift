@@ -22,6 +22,26 @@ struct WakeUpCheckView: View {
             TimelineView(.periodic(from: .now, by: 1)) { timeline in
                 content(now: timeline.date)
             }
+
+            // Close — back to the alarm list. The check cycle keeps running:
+            // the countdown continues and the re-ring will still fire.
+            VStack {
+                HStack {
+                    Spacer()
+                    Button {
+                        alarmKit.pendingWakeUpAlarm = nil
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 32))
+                            .symbolRenderingMode(.hierarchical)
+                            .foregroundStyle(.white.opacity(0.6))
+                    }
+                    .accessibilityLabel(Text("Close"))
+                    .padding(.trailing, 20)
+                }
+                Spacer()
+            }
+            .padding(.top, 12)
         }
     }
 
