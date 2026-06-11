@@ -2,10 +2,8 @@ import AlarmKit
 import AppIntents
 import SwiftUI
 
-/// AlarmKit requires a metadata type for AlarmAttributes — we don't need any.
-struct EmptyMetadata: AlarmMetadata {}
-
 // MARK: - AlarmKitManager
+// (EmptyMetadata lives in AlarmMetadataShared.swift — shared with the widget.)
 //
 // Schedules real system alarms via AlarmKit (iOS 26+). Alarms ring exactly like
 // the built-in Clock app: full-screen on the Lock Screen, ring until dismissed,

@@ -21,7 +21,35 @@
 		B320001600000000DEADBEEF /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B310001900000000DEADBEEF /* Localizable.xcstrings */; };
 		B320001700000000DEADBEEF /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B310002000000000DEADBEEF /* InfoPlist.xcstrings */; };
 		B320001800000000DEADBEEF /* AlarmToneGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310002100000000DEADBEEF /* AlarmToneGenerator.swift */; };
+		B320001900000000DEADBEEF /* AlarmMetadataShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310002500000000DEADBEEF /* AlarmMetadataShared.swift */; };
+		B320002000000000DEADBEEF /* AlarmMetadataShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310002500000000DEADBEEF /* AlarmMetadataShared.swift */; };
+		B320002100000000DEADBEEF /* AlarmWidgetsBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310002200000000DEADBEEF /* AlarmWidgetsBundle.swift */; };
+		B320002200000000DEADBEEF /* AlarmWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B310002400000000DEADBEEF /* AlarmWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		B340000300000000DEADBEEF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B340000100000000DEADBEEF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B330000200000000DEADBEEF;
+			remoteInfo = AlarmWidgets;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		B350000700000000DEADBEEF /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				B320002200000000DEADBEEF /* AlarmWidgets.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		B310000100000000DEADBEEF /* AlarmApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmApp.swift; sourceTree = "<group>"; };
@@ -41,10 +69,21 @@
 		B310001900000000DEADBEEF /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		B310002000000000DEADBEEF /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		B310002100000000DEADBEEF /* AlarmToneGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmToneGenerator.swift; sourceTree = "<group>"; };
+		B310002200000000DEADBEEF /* AlarmWidgetsBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmWidgetsBundle.swift; sourceTree = "<group>"; };
+		B310002300000000DEADBEEF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B310002400000000DEADBEEF /* AlarmWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = AlarmWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B310002500000000DEADBEEF /* AlarmMetadataShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmMetadataShared.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		B350000300000000DEADBEEF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B350000500000000DEADBEEF /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -58,6 +97,7 @@
 			isa = PBXGroup;
 			children = (
 				B300000100000000DEADBEEF /* AlarmClock */,
+				B300000300000000DEADBEEF /* AlarmWidgets */,
 				B300000200000000DEADBEEF /* Products */,
 			);
 			sourceTree = "<group>";
@@ -77,6 +117,7 @@
 				B310001600000000DEADBEEF /* AlarmIntents.swift */,
 				B310001800000000DEADBEEF /* WakeUpCheckView.swift */,
 				B310002100000000DEADBEEF /* AlarmToneGenerator.swift */,
+				B310002500000000DEADBEEF /* AlarmMetadataShared.swift */,
 				B310001900000000DEADBEEF /* Localizable.xcstrings */,
 				B310002000000000DEADBEEF /* InfoPlist.xcstrings */,
 				B310001700000000DEADBEEF /* Info.plist */,
@@ -89,8 +130,18 @@
 			isa = PBXGroup;
 			children = (
 				B310000800000000DEADBEEF /* AlarmClock.app */,
+				B310002400000000DEADBEEF /* AlarmWidgets.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		B300000300000000DEADBEEF /* AlarmWidgets */ = {
+			isa = PBXGroup;
+			children = (
+				B310002200000000DEADBEEF /* AlarmWidgetsBundle.swift */,
+				B310002300000000DEADBEEF /* Info.plist */,
+			);
+			path = AlarmWidgets;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -103,17 +154,44 @@
 				B350000100000000DEADBEEF /* Sources */,
 				B350000200000000DEADBEEF /* Resources */,
 				B350000300000000DEADBEEF /* Frameworks */,
+				B350000700000000DEADBEEF /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				B340000200000000DEADBEEF /* PBXTargetDependency */,
 			);
 			name = AlarmClock;
 			productName = AlarmClock;
 			productReference = B310000800000000DEADBEEF /* AlarmClock.app */;
 			productType = "com.apple.product-type.application";
 		};
+		B330000200000000DEADBEEF /* AlarmWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B360000300000000DEADBEEF /* Build configuration list for PBXNativeTarget "AlarmWidgets" */;
+			buildPhases = (
+				B350000400000000DEADBEEF /* Sources */,
+				B350000500000000DEADBEEF /* Frameworks */,
+				B350000600000000DEADBEEF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AlarmWidgets;
+			productName = AlarmWidgets;
+			productReference = B310002400000000DEADBEEF /* AlarmWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
+
+/* Begin PBXTargetDependency section */
+		B340000200000000DEADBEEF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B330000200000000DEADBEEF /* AlarmWidgets */;
+			targetProxy = B340000300000000DEADBEEF /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXProject section */
 		B340000100000000DEADBEEF /* Project object */ = {
@@ -124,6 +202,9 @@
 				LastUpgradeCheck = 1540;
 				TargetAttributes = {
 					B330000100000000DEADBEEF = {
+						CreatedOnToolsVersion = 15.4;
+					};
+					B330000200000000DEADBEEF = {
 						CreatedOnToolsVersion = 15.4;
 					};
 				};
@@ -152,6 +233,7 @@
 			projectRoot = "";
 			targets = (
 				B330000100000000DEADBEEF /* AlarmClock */,
+				B330000200000000DEADBEEF /* AlarmWidgets */,
 			);
 		};
 /* End PBXProject section */
@@ -164,6 +246,13 @@
 				B320000700000000DEADBEEF /* Assets.xcassets in Resources */,
 				B320001600000000DEADBEEF /* Localizable.xcstrings in Resources */,
 				B320001700000000DEADBEEF /* InfoPlist.xcstrings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B350000600000000DEADBEEF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -185,6 +274,16 @@
 				B320001400000000DEADBEEF /* AlarmIntents.swift in Sources */,
 				B320001500000000DEADBEEF /* WakeUpCheckView.swift in Sources */,
 				B320001800000000DEADBEEF /* AlarmToneGenerator.swift in Sources */,
+				B320001900000000DEADBEEF /* AlarmMetadataShared.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B350000400000000DEADBEEF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B320002100000000DEADBEEF /* AlarmWidgetsBundle.swift in Sources */,
+				B320002000000000DEADBEEF /* AlarmMetadataShared.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -367,6 +466,54 @@
 			};
 			name = Release;
 		};
+		B370000500000000DEADBEEF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4LCAH5J7V4;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = AlarmWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = AlarmWidgets;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.4lcah5j7v4.AlarmClock.AlarmWidgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		B370000600000000DEADBEEF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4LCAH5J7V4;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = AlarmWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = AlarmWidgets;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.4lcah5j7v4.AlarmClock.AlarmWidgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -384,6 +531,15 @@
 			buildConfigurations = (
 				B370000300000000DEADBEEF /* Debug */,
 				B370000400000000DEADBEEF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B360000300000000DEADBEEF /* Build configuration list for PBXNativeTarget "AlarmWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B370000500000000DEADBEEF /* Debug */,
+				B370000600000000DEADBEEF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

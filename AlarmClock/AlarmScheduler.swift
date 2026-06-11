@@ -60,8 +60,13 @@ class AlarmScheduler {
     /// Disabled alarms are left untouched so a pending wake-up check cycle for a
     /// just-fired once-alarm isn't cancelled by merely opening the app.
     func rescheduleAll(from store: AlarmStore) {
-        for alarm in store.alarms where alarm.isEnabled {
-            enable(alarm)
+        // Schedule sequentially — concurrent schedule() calls right after launch
+        // can race the AlarmKit daemon and fail with a generic Code=0 error.
+        let enabled = store.alarms.filter(\.isEnabled)
+        Task {
+            for alarm in enabled {
+                await AlarmKitManager.shared.schedule(alarm)
+            }
         }
     }
 }
