@@ -25,6 +25,7 @@
 		B320002000000000DEADBEEF /* AlarmMetadataShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310002500000000DEADBEEF /* AlarmMetadataShared.swift */; };
 		B320002100000000DEADBEEF /* AlarmWidgetsBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310002200000000DEADBEEF /* AlarmWidgetsBundle.swift */; };
 		B320002200000000DEADBEEF /* AlarmWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B310002400000000DEADBEEF /* AlarmWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		B320002300000000DEADBEEF /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B310002600000000DEADBEEF /* OnboardingView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -73,6 +74,7 @@
 		B310002300000000DEADBEEF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B310002400000000DEADBEEF /* AlarmWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = AlarmWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		B310002500000000DEADBEEF /* AlarmMetadataShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlarmMetadataShared.swift; sourceTree = "<group>"; };
+		B310002600000000DEADBEEF /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,6 +118,7 @@
 				B310001500000000DEADBEEF /* AlarmKitManager.swift */,
 				B310001600000000DEADBEEF /* AlarmIntents.swift */,
 				B310001800000000DEADBEEF /* WakeUpCheckView.swift */,
+				B310002600000000DEADBEEF /* OnboardingView.swift */,
 				B310002100000000DEADBEEF /* AlarmToneGenerator.swift */,
 				B310002500000000DEADBEEF /* AlarmMetadataShared.swift */,
 				B310001900000000DEADBEEF /* Localizable.xcstrings */,
@@ -275,6 +278,7 @@
 				B320001500000000DEADBEEF /* WakeUpCheckView.swift in Sources */,
 				B320001800000000DEADBEEF /* AlarmToneGenerator.swift in Sources */,
 				B320001900000000DEADBEEF /* AlarmMetadataShared.swift in Sources */,
+				B320002300000000DEADBEEF /* OnboardingView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -12,6 +12,8 @@ struct ContentView: View {
     @State private var alarmToEdit: Alarm?
     @State private var showPermissionAlert = false
     @State private var showHistory = false
+    @State private var showOnboarding = false
+    @AppStorage("onboarding_seen_v1") private var onboardingSeen = false
 
     var body: some View {
         NavigationStack {
@@ -49,6 +51,13 @@ struct ContentView: View {
                         Label("Notification Settings", systemImage: "bell.badge")
                     }
                 }
+                ToolbarItem(placement: .secondaryAction) {
+                    Button {
+                        showOnboarding = true
+                    } label: {
+                        Label("How it works", systemImage: "info.circle")
+                    }
+                }
             }
             .sheet(isPresented: $showAddAlarm) {
                 AddAlarmView()
@@ -59,6 +68,12 @@ struct ContentView: View {
             .sheet(isPresented: $showHistory) {
                 AlarmHistoryView()
                     .environmentObject(historyStore)
+            }
+            .sheet(isPresented: $showOnboarding, onDismiss: { onboardingSeen = true }) {
+                OnboardingView()
+            }
+            .onAppear {
+                if !onboardingSeen { showOnboarding = true }
             }
             .alert("No Permission", isPresented: $showPermissionAlert) {
                 Button("Settings") { openSettings() }
