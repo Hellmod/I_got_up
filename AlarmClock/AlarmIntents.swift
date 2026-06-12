@@ -44,6 +44,9 @@ struct StopAlarmIntent: LiveActivityIntent {
             store.update(updated)
         }
 
+        // A fired snooze ring leaves bookkeeping behind — clear it.
+        AlarmKitManager.shared.cancelSnoozeRing(for: id)
+
         // Stopping the alarm starts the wake-up verification cycle:
         // delay phase, response window, then an AlarmKit re-ring if no response.
         await AlarmKitManager.shared.startWakeUpCheck(for: alarm)
@@ -54,8 +57,10 @@ struct StopAlarmIntent: LiveActivityIntent {
 
 // MARK: - SnoozeAlarmIntent
 //
-// Runs when the user taps "Drzemka" on the system alarm screen. Transitions the
-// alarm into its countdown state — the system re-fires it after snoozeDuration.
+// Runs when the user taps the snooze button on the system alarm screen.
+// Swipe-proof: instead of the system countdown (whose Live Activity can be
+// swiped away, cancelling the re-fire), it stops the ringing alarm and
+// schedules our own fixed-date snooze ring plus a cosmetic countdown.
 
 struct SnoozeAlarmIntent: LiveActivityIntent {
     static var title: LocalizedStringResource = "Snooze"
@@ -72,7 +77,7 @@ struct SnoozeAlarmIntent: LiveActivityIntent {
 
     func perform() async throws -> some IntentResult {
         if let firing = UUID(uuidString: firingID) {
-            try? await AlarmManager.shared.countdown(id: firing)
+            try? await AlarmManager.shared.stop(id: firing)
         }
         guard let id = UUID(uuidString: alarmID) else { return .result() }
 
@@ -84,9 +89,19 @@ struct SnoozeAlarmIntent: LiveActivityIntent {
         AlarmHistoryStore().record(alarm: alarm, action: .snoozed,
                                    detail: String(localized: "\(alarm.snoozeDuration) min"))
 
+        // One-time alarms: the original occurrence is consumed by snoozing —
+        // the snooze chain continues through its own fixed-date alarm.
+        if firingID == alarmID, case .once = alarm.repeatSchedule, alarm.isEnabled {
+            var updated = alarm
+            updated.isEnabled = false
+            store.update(updated)
+        }
+
         // Snoozing means the user is not up yet — any pending wake-up check is
         // stale; a fresh cycle starts when they eventually stop the alarm.
         AlarmKitManager.shared.cancelWakeUpCheck(for: id)
+
+        await AlarmKitManager.shared.scheduleSnoozeRing(for: alarm)
 
         return .result()
     }

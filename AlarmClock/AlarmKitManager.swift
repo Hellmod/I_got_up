@@ -12,6 +12,12 @@ struct WakeCheckState: Codable {
     var ringDate: Date   // phase 2 ends: the re-ring alarm fires
 }
 
+/// A pending swipe-proof snooze ring.
+struct SnoozeState: Codable {
+    var alarmID: UUID
+    var ringDate: Date
+}
+
 // MARK: - AlarmKitManager
 // (EmptyMetadata lives in AlarmMetadataShared.swift — shared with the widget.)
 //
@@ -31,12 +37,31 @@ final class AlarmKitManager: ObservableObject {
     @Published var permissionDenied = false
     /// Set when the wake-up confirmation screen should be presented.
     @Published var pendingWakeUpAlarm: Alarm?
+    /// Running cycles, mirrored from UserDefaults for the in-app countdown list.
+    @Published var activeWakeChecks: [WakeCheckState] = []
+    @Published var activeSnoozes: [SnoozeState] = []
 
     private let reRingMapKey = "alarmkit_rering_ids"
     private let backupMapKey = "alarmkit_backup_ids" // legacy — swept on cancel
+    private let snoozeMapKey = "alarmkit_snooze_ids"
     private let wakeCheckStatesKey = "wake_check_states_v1"
+    private let snoozeStatesKey = "snooze_states_v1"
 
-    private init() {}
+    private init() {
+        refreshActiveCycles()
+    }
+
+    /// Re-reads cycle state from UserDefaults (intents may have written it
+    /// from a background launch) and publishes it for the in-app list.
+    func refreshActiveCycles() {
+        let now = Date()
+        let wake = loadWakeCheckStates().filter { $0.ringDate > now }
+        let snooze = loadSnoozeStates().filter { $0.ringDate > now }
+        DispatchQueue.main.async {
+            self.activeWakeChecks = wake
+            self.activeSnoozes = snooze
+        }
+    }
 
     // MARK: - Authorization
 
@@ -94,6 +119,61 @@ final class AlarmKitManager: ObservableObject {
     func cancel(_ alarmID: UUID) {
         Task { try? await AlarmManager.shared.cancel(id: alarmID) }
         cancelReRing(for: alarmID)
+        cancelSnoozeRing(for: alarmID)
+    }
+
+    // MARK: - Snooze ring (swipe-proof)
+
+    /// Replaces the system snooze countdown: stops nothing by itself — just
+    /// schedules a fixed-date alarm (no swipeable Live Activity) plus our own
+    /// cosmetic countdown activity.
+    func scheduleSnoozeRing(for alarm: Alarm) async {
+        guard await requestAuthorizationIfNeeded() else { return }
+        cancelSnoozeRing(for: alarm.id)
+
+        let ringDate = Date().addingTimeInterval(TimeInterval(alarm.snoozeDuration * 60))
+        let title = alarm.label.isEmpty ? String(localized: "Alarm \(alarm.timeString)") : alarm.label
+
+        let snoozeID = UUID()
+        saveID(snoozeID, for: alarm.id, in: snoozeMapKey)
+        let config = makeConfiguration(for: alarm, schedule: .fixed(ringDate),
+                                       firingID: snoozeID, title: title)
+        do {
+            _ = try await AlarmManager.shared.schedule(id: snoozeID, configuration: config)
+            print("✅ AlarmKit snooze ring in \(alarm.snoozeDuration)min [\(snoozeID)]")
+        } catch {
+            print("❌ AlarmKit snooze ring failed: \(error)")
+        }
+
+        var states = loadSnoozeStates().filter { $0.alarmID != alarm.id }
+        states.append(SnoozeState(alarmID: alarm.id, ringDate: ringDate))
+        saveSnoozeStates(states)
+
+        startCountdownActivity(for: alarm, ringDate: ringDate,
+                               title: String(localized: "Snooze"))
+        refreshActiveCycles()
+    }
+
+    func cancelSnoozeRing(for alarmID: UUID) {
+        if let id = storedID(for: alarmID, in: snoozeMapKey) {
+            removeID(for: alarmID, in: snoozeMapKey)
+            Task { try? await AlarmManager.shared.cancel(id: id) }
+        }
+        saveSnoozeStates(loadSnoozeStates().filter { $0.alarmID != alarmID })
+        endCountdownActivity(for: alarmID)
+        refreshActiveCycles()
+    }
+
+    private func loadSnoozeStates() -> [SnoozeState] {
+        guard let data = UserDefaults.standard.data(forKey: snoozeStatesKey),
+              let states = try? JSONDecoder().decode([SnoozeState].self, from: data) else { return [] }
+        return states
+    }
+
+    private func saveSnoozeStates(_ states: [SnoozeState]) {
+        if let data = try? JSONEncoder().encode(states) {
+            UserDefaults.standard.set(data, forKey: snoozeStatesKey)
+        }
     }
 
     // MARK: - Re-ring (Wake-Up Check escalation)
@@ -125,7 +205,8 @@ final class AlarmKitManager: ObservableObject {
 
         // The visible countdown is our own cosmetic Live Activity — swiping it
         // away dismisses only the UI, never the alarm above.
-        startCountdownActivity(for: alarm, ringDate: ringDate)
+        startCountdownActivity(for: alarm, ringDate: ringDate,
+                               title: String(localized: "Time left to confirm you're up"))
     }
 
     func cancelReRing(for alarmID: UUID) {
@@ -140,11 +221,11 @@ final class AlarmKitManager: ObservableObject {
 
     // MARK: - Cosmetic countdown Live Activity
 
-    private func startCountdownActivity(for alarm: Alarm, ringDate: Date) {
+    private func startCountdownActivity(for alarm: Alarm, ringDate: Date, title: String) {
         endCountdownActivity(for: alarm.id)
         let attributes = WakeCheckActivityAttributes(
             alarmID: alarm.id.uuidString,
-            title: String(localized: "Time left to confirm you're up"))
+            title: title)
         let content = ActivityContent(
             state: WakeCheckActivityAttributes.ContentState(ringDate: ringDate),
             staleDate: ringDate.addingTimeInterval(60))
@@ -192,6 +273,7 @@ final class AlarmKitManager: ObservableObject {
     func cancelWakeUpCheck(for alarmID: UUID) {
         clearWakeCheckState(for: alarmID)
         cancelReRing(for: alarmID)
+        refreshActiveCycles()
     }
 
     func wakeCheckState(for alarmID: UUID) -> WakeCheckState? {
@@ -208,6 +290,7 @@ final class AlarmKitManager: ObservableObject {
             ringDate: now.addingTimeInterval(delay + response)))
         saveWakeCheckStates(states)
         await scheduleReRing(for: alarm, after: delay + response)
+        refreshActiveCycles()
     }
 
     private func loadWakeCheckStates() -> [WakeCheckState] {
@@ -230,14 +313,11 @@ final class AlarmKitManager: ObservableObject {
 
     // Note: our own `Alarm` model shadows AlarmKit's `Alarm` type, so AlarmKit's
     // nested types must be written fully qualified (AlarmKit.Alarm.…).
-    /// `preAlert` turns the alarm into a countdown timer: the system shows a
-    /// live ticking countdown (Lock Screen / Dynamic Island) until it alerts.
     private func makeConfiguration(
         for alarm: Alarm,
         schedule: AlarmKit.Alarm.Schedule?,
         firingID: UUID,
-        title: String,
-        preAlert: TimeInterval? = nil
+        title: String
     ) -> AlarmManager.AlarmConfiguration<EmptyMetadata> {
         let stopButton = AlarmButton(
             text: "Stop",
@@ -262,30 +342,15 @@ final class AlarmKitManager: ObservableObject {
                 stopButton: stopButton)
         }
 
-        let presentation: AlarmPresentation
-        if preAlert != nil {
-            let countdown = AlarmPresentation.Countdown(
-                title: "Time left to confirm you're up",
-                pauseButton: nil)
-            presentation = AlarmPresentation(alert: alert, countdown: countdown)
-        } else {
-            presentation = AlarmPresentation(alert: alert)
-        }
-
         let attributes = AlarmAttributes<EmptyMetadata>(
-            presentation: presentation,
+            presentation: AlarmPresentation(alert: alert),
             tintColor: .orange)
 
-        let postAlert: TimeInterval? = alarm.snoozeEnabled
-            ? TimeInterval(alarm.snoozeDuration * 60)
-            : nil
-        let countdownDuration: AlarmKit.Alarm.CountdownDuration? =
-            (preAlert == nil && postAlert == nil)
-                ? nil
-                : AlarmKit.Alarm.CountdownDuration(preAlert: preAlert, postAlert: postAlert)
-
+        // countdownDuration stays nil everywhere: snooze re-fires through our
+        // own fixed-date alarm (swipe-proof), so the system countdown — whose
+        // Live Activity can be swiped away to cancel it — is never used.
         return AlarmManager.AlarmConfiguration(
-            countdownDuration: countdownDuration,
+            countdownDuration: nil,
             schedule: schedule,
             attributes: attributes,
             stopIntent: StopAlarmIntent(alarmID: alarm.id.uuidString,

@@ -78,6 +78,7 @@ struct ContentView: View {
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
             store.reload()
             historyStore.reload()
+            alarmKit.refreshActiveCycles()
             // Wake-up check countdown is running (user tapped the Live Activity
             // or just opened the app) — show the confirmation screen directly.
             if alarmKit.pendingWakeUpAlarm == nil,
@@ -106,23 +107,90 @@ struct ContentView: View {
 
     private var alarmList: some View {
         List {
-            ForEach(store.alarms.sorted { lhs, rhs in
-                if lhs.hour != rhs.hour { return lhs.hour < rhs.hour }
-                return lhs.minute < rhs.minute
-            }) { alarm in
-                AlarmRow(alarm: alarm)
-                    .contentShape(Rectangle())
-                    .onTapGesture { alarmToEdit = alarm }
-                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                        Button(role: .destructive) {
-                            AlarmScheduler.shared.alarmDeleted(alarm, store: store)
-                        } label: {
-                            Label("Delete", systemImage: "trash")
-                        }
+            // Running countdowns — visible in-app even if the user swiped the
+            // Live Activity away; the wake-check row opens the confirm screen.
+            if !alarmKit.activeWakeChecks.isEmpty || !alarmKit.activeSnoozes.isEmpty {
+                Section("In progress") {
+                    ForEach(alarmKit.activeWakeChecks, id: \.alarmID) { state in
+                        wakeCheckRow(state)
                     }
+                    ForEach(alarmKit.activeSnoozes, id: \.alarmID) { state in
+                        snoozeRow(state)
+                    }
+                }
+            }
+
+            Section {
+                ForEach(store.alarms.sorted { lhs, rhs in
+                    if lhs.hour != rhs.hour { return lhs.hour < rhs.hour }
+                    return lhs.minute < rhs.minute
+                }) { alarm in
+                    AlarmRow(alarm: alarm)
+                        .contentShape(Rectangle())
+                        .onTapGesture { alarmToEdit = alarm }
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                            Button(role: .destructive) {
+                                AlarmScheduler.shared.alarmDeleted(alarm, store: store)
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        }
+                }
             }
         }
         .listStyle(.insetGrouped)
+    }
+
+    private func wakeCheckRow(_ state: WakeCheckState) -> some View {
+        Button {
+            if let alarm = store.alarms.first(where: { $0.id == state.alarmID }) {
+                alarmKit.pendingWakeUpAlarm = alarm
+            }
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "hourglass")
+                    .foregroundStyle(.orange)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Wake-Up Check")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.primary)
+                    Text("Alarm will ring again in:")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Text(timerInterval: Date.now...max(state.ringDate, Date.now), countsDown: true)
+                    .font(.title3)
+                    .fontWeight(.semibold)
+                    .monospacedDigit()
+                    .foregroundStyle(.orange)
+                Image(systemName: "chevron.right")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    private func snoozeRow(_ state: SnoozeState) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: "moon.zzz.fill")
+                .foregroundStyle(.indigo)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Snooze")
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                Text("Alarm will ring again in:")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+            Text(timerInterval: Date.now...max(state.ringDate, Date.now), countsDown: true)
+                .font(.title3)
+                .fontWeight(.semibold)
+                .monospacedDigit()
+                .foregroundStyle(.indigo)
+        }
     }
 
     @ViewBuilder
