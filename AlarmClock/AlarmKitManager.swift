@@ -1,3 +1,4 @@
+import ActivityKit
 import AlarmKit
 import AppIntents
 import SwiftUI
@@ -32,11 +33,8 @@ final class AlarmKitManager: ObservableObject {
     @Published var pendingWakeUpAlarm: Alarm?
 
     private let reRingMapKey = "alarmkit_rering_ids"
-    private let backupMapKey = "alarmkit_backup_ids"
+    private let backupMapKey = "alarmkit_backup_ids" // legacy — swept on cancel
     private let wakeCheckStatesKey = "wake_check_states_v1"
-
-    /// How long after the countdown's fire date the invisible backup rings.
-    private let backupGrace: TimeInterval = 45
 
     private init() {}
 
@@ -108,38 +106,26 @@ final class AlarmKitManager: ObservableObject {
 
         let baseName = alarm.label.isEmpty ? String(localized: "Alarm") : alarm.label
         let title = String(localized: "\(baseName) — no response!")
+        let ringDate = Date().addingTimeInterval(seconds)
 
-        // Countdown timer: the system shows a live ticking countdown until
-        // the re-ring fires.
+        // The real re-ring: a plain fixed-date alarm. No countdownDuration
+        // means no system Live Activity — there is nothing the user can swipe
+        // away to cancel it, and it fires exactly on time even when the app
+        // is killed.
         let reRingID = UUID()
         saveID(reRingID, for: alarm.id, in: reRingMapKey)
-        let config = makeConfiguration(for: alarm, schedule: nil,
-                                       firingID: reRingID, title: title,
-                                       preAlert: seconds)
+        let config = makeConfiguration(for: alarm, schedule: .fixed(ringDate),
+                                       firingID: reRingID, title: title)
         do {
             _ = try await AlarmManager.shared.schedule(id: reRingID, configuration: config)
-            print("✅ AlarmKit re-ring in \(Int(seconds))s [\(reRingID)]")
+            print("✅ AlarmKit re-ring at +\(Int(seconds))s [\(reRingID)]")
         } catch {
             print("❌ AlarmKit re-ring failed: \(error)")
         }
 
-        // Swipe-proof backup: dismissing the countdown Live Activity silently
-        // CANCELS the timer above. This second alarm is a plain fixed-date
-        // alarm — no countdown, so no Live Activity to swipe away — and fires
-        // shortly after the countdown would have. Stopping or confirming the
-        // cycle cancels it together with the countdown.
-        let backupID = UUID()
-        saveID(backupID, for: alarm.id, in: backupMapKey)
-        let backupConfig = makeConfiguration(
-            for: alarm,
-            schedule: .fixed(Date().addingTimeInterval(seconds + backupGrace)),
-            firingID: backupID, title: title)
-        do {
-            _ = try await AlarmManager.shared.schedule(id: backupID, configuration: backupConfig)
-            print("✅ AlarmKit backup re-ring in \(Int(seconds + backupGrace))s [\(backupID)]")
-        } catch {
-            print("❌ AlarmKit backup re-ring failed: \(error)")
-        }
+        // The visible countdown is our own cosmetic Live Activity — swiping it
+        // away dismisses only the UI, never the alarm above.
+        startCountdownActivity(for: alarm, ringDate: ringDate)
     }
 
     func cancelReRing(for alarmID: UUID) {
@@ -147,6 +133,34 @@ final class AlarmKitManager: ObservableObject {
             if let id = storedID(for: alarmID, in: mapKey) {
                 removeID(for: alarmID, in: mapKey)
                 Task { try? await AlarmManager.shared.cancel(id: id) }
+            }
+        }
+        endCountdownActivity(for: alarmID)
+    }
+
+    // MARK: - Cosmetic countdown Live Activity
+
+    private func startCountdownActivity(for alarm: Alarm, ringDate: Date) {
+        endCountdownActivity(for: alarm.id)
+        let attributes = WakeCheckActivityAttributes(
+            alarmID: alarm.id.uuidString,
+            title: String(localized: "Time left to confirm you're up"))
+        let content = ActivityContent(
+            state: WakeCheckActivityAttributes.ContentState(ringDate: ringDate),
+            staleDate: ringDate.addingTimeInterval(60))
+        do {
+            _ = try Activity.request(attributes: attributes, content: content)
+        } catch {
+            // Live Activities disabled — countdown invisible, alarm unaffected.
+            print("⚠️ Countdown activity not shown: \(error)")
+        }
+    }
+
+    private func endCountdownActivity(for alarmID: UUID) {
+        Task {
+            for activity in Activity<WakeCheckActivityAttributes>.activities
+            where activity.attributes.alarmID == alarmID.uuidString {
+                await activity.end(nil, dismissalPolicy: .immediate)
             }
         }
     }
