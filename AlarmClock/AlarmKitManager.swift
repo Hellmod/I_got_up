@@ -32,7 +32,11 @@ final class AlarmKitManager: ObservableObject {
     @Published var pendingWakeUpAlarm: Alarm?
 
     private let reRingMapKey = "alarmkit_rering_ids"
+    private let backupMapKey = "alarmkit_backup_ids"
     private let wakeCheckStatesKey = "wake_check_states_v1"
+
+    /// How long after the countdown's fire date the invisible backup rings.
+    private let backupGrace: TimeInterval = 45
 
     private init() {}
 
@@ -102,13 +106,13 @@ final class AlarmKitManager: ObservableObject {
         guard await requestAuthorizationIfNeeded() else { return }
         cancelReRing(for: alarm.id)
 
-        let reRingID = UUID()
-        saveReRingID(reRingID, for: alarm.id)
-
         let baseName = alarm.label.isEmpty ? String(localized: "Alarm") : alarm.label
         let title = String(localized: "\(baseName) — no response!")
-        // Countdown timer instead of a fixed date: the system shows a live
-        // ticking countdown until the re-ring fires.
+
+        // Countdown timer: the system shows a live ticking countdown until
+        // the re-ring fires.
+        let reRingID = UUID()
+        saveID(reRingID, for: alarm.id, in: reRingMapKey)
         let config = makeConfiguration(for: alarm, schedule: nil,
                                        firingID: reRingID, title: title,
                                        preAlert: seconds)
@@ -118,12 +122,33 @@ final class AlarmKitManager: ObservableObject {
         } catch {
             print("❌ AlarmKit re-ring failed: \(error)")
         }
+
+        // Swipe-proof backup: dismissing the countdown Live Activity silently
+        // CANCELS the timer above. This second alarm is a plain fixed-date
+        // alarm — no countdown, so no Live Activity to swipe away — and fires
+        // shortly after the countdown would have. Stopping or confirming the
+        // cycle cancels it together with the countdown.
+        let backupID = UUID()
+        saveID(backupID, for: alarm.id, in: backupMapKey)
+        let backupConfig = makeConfiguration(
+            for: alarm,
+            schedule: .fixed(Date().addingTimeInterval(seconds + backupGrace)),
+            firingID: backupID, title: title)
+        do {
+            _ = try await AlarmManager.shared.schedule(id: backupID, configuration: backupConfig)
+            print("✅ AlarmKit backup re-ring in \(Int(seconds + backupGrace))s [\(backupID)]")
+        } catch {
+            print("❌ AlarmKit backup re-ring failed: \(error)")
+        }
     }
 
     func cancelReRing(for alarmID: UUID) {
-        guard let reRingID = storedReRingID(for: alarmID) else { return }
-        removeReRingID(for: alarmID)
-        Task { try? await AlarmManager.shared.cancel(id: reRingID) }
+        for mapKey in [reRingMapKey, backupMapKey] {
+            if let id = storedID(for: alarmID, in: mapKey) {
+                removeID(for: alarmID, in: mapKey)
+                Task { try? await AlarmManager.shared.cancel(id: id) }
+            }
+        }
     }
 
     /// Alarms whose wake-up check cycle is currently running (countdown ticking).
@@ -281,21 +306,21 @@ final class AlarmKitManager: ObservableObject {
     // The re-ring is a separate AlarmKit alarm with its own UUID; remember the
     // mapping so it can be cancelled when the user confirms they're awake.
 
-    private func storedReRingID(for alarmID: UUID) -> UUID? {
-        let map = UserDefaults.standard.dictionary(forKey: reRingMapKey) as? [String: String]
+    private func storedID(for alarmID: UUID, in mapKey: String) -> UUID? {
+        let map = UserDefaults.standard.dictionary(forKey: mapKey) as? [String: String]
         guard let str = map?[alarmID.uuidString] else { return nil }
         return UUID(uuidString: str)
     }
 
-    private func saveReRingID(_ id: UUID, for alarmID: UUID) {
-        var map = (UserDefaults.standard.dictionary(forKey: reRingMapKey) as? [String: String]) ?? [:]
+    private func saveID(_ id: UUID, for alarmID: UUID, in mapKey: String) {
+        var map = (UserDefaults.standard.dictionary(forKey: mapKey) as? [String: String]) ?? [:]
         map[alarmID.uuidString] = id.uuidString
-        UserDefaults.standard.set(map, forKey: reRingMapKey)
+        UserDefaults.standard.set(map, forKey: mapKey)
     }
 
-    private func removeReRingID(for alarmID: UUID) {
-        var map = (UserDefaults.standard.dictionary(forKey: reRingMapKey) as? [String: String]) ?? [:]
+    private func removeID(for alarmID: UUID, in mapKey: String) {
+        var map = (UserDefaults.standard.dictionary(forKey: mapKey) as? [String: String]) ?? [:]
         map.removeValue(forKey: alarmID.uuidString)
-        UserDefaults.standard.set(map, forKey: reRingMapKey)
+        UserDefaults.standard.set(map, forKey: mapKey)
     }
 }
