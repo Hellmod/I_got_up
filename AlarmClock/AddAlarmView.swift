@@ -107,11 +107,7 @@ struct AddAlarmView: View {
                 Section("Snooze") {
                     Toggle("Snooze", isOn: $snoozeEnabled)
                     if snoozeEnabled {
-                        Picker("Snooze duration", selection: $snoozeDuration) {
-                            ForEach(snoozeChoices, id: \.self) { minutes in
-                                Text(durationText(minutes: minutes)).tag(minutes)
-                            }
-                        }
+                        DurationPickerRow(title: "Snooze duration", minutes: $snoozeDuration)
                     }
                 }
 
@@ -120,16 +116,10 @@ struct AddAlarmView: View {
                     Toggle("Wake-Up Check", isOn: $wakeUpCheckEnabled)
 
                     if wakeUpCheckEnabled {
-                        Picker("Delay", selection: $wakeUpCheckDelay) {
-                            ForEach(delayChoices, id: \.self) { minutes in
-                                Text(durationText(minutes: minutes)).tag(minutes)
-                            }
-                        }
-                        Picker("Re-ring after no response", selection: $wakeUpNoResponseTime) {
-                            ForEach(noResponseChoices, id: \.self) { minutes in
-                                Text(durationText(minutes: minutes)).tag(minutes)
-                            }
-                        }
+                        DurationPickerRow(title: "Delay", minutes: $wakeUpCheckDelay,
+                                          allowZero: true)
+                        DurationPickerRow(title: "Re-ring after no response",
+                                          minutes: $wakeUpNoResponseTime)
                     }
                 } header: {
                     Text("Wake-up verification")
@@ -157,22 +147,6 @@ struct AddAlarmView: View {
     }
 
     // MARK: - Helpers
-
-    // Long durations welcome — e.g. a 2 h snooze or a 30 min confirmation
-    // window. The current value is kept selectable even if it's not on the
-    // standard list (alarms saved by other app versions).
-    private var snoozeChoices: [Int] { choices([1, 5, 10, 15, 20, 30, 45, 60, 90, 120], current: snoozeDuration) }
-    private var delayChoices: [Int] { choices([0, 1, 2, 3, 5, 10, 15, 20, 30, 45, 60, 90, 120], current: wakeUpCheckDelay) }
-    private var noResponseChoices: [Int] { choices([1, 2, 3, 5, 10, 15, 20, 30, 45, 60, 90, 120], current: wakeUpNoResponseTime) }
-
-    private func choices(_ base: [Int], current: Int) -> [Int] {
-        var values = base
-        if !values.contains(current) {
-            values.append(current)
-            values.sort()
-        }
-        return values
-    }
 
     private var isOnce: Bool {
         if case .once = repeatSchedule { return true }
@@ -251,6 +225,77 @@ struct AddAlarmView: View {
             AlarmScheduler.shared.alarmAdded(alarm, store: store)
         }
         dismiss()
+    }
+}
+
+// MARK: - DurationPickerRow
+
+/// Form row with the formatted duration; tapping it expands hour/minute
+/// wheels so any value can be dialed in (0–12 h, 0–59 min).
+struct DurationPickerRow: View {
+    let title: LocalizedStringKey
+    @Binding var minutes: Int
+    var allowZero: Bool = false
+
+    @State private var expanded = false
+
+    var body: some View {
+        Button {
+            withAnimation { expanded.toggle() }
+        } label: {
+            HStack {
+                Text(title)
+                    .foregroundStyle(.primary)
+                Spacer()
+                Text(durationText(minutes: minutes))
+                    .foregroundStyle(expanded ? Color.orange : Color.secondary)
+            }
+        }
+
+        if expanded {
+            HStack(spacing: 4) {
+                Picker("", selection: hoursBinding) {
+                    ForEach(0...12, id: \.self) { h in
+                        Text("\(h)").tag(h)
+                    }
+                }
+                .pickerStyle(.wheel)
+                .frame(maxWidth: .infinity)
+                .clipped()
+                Text("h")
+                    .foregroundStyle(.secondary)
+
+                Picker("", selection: minutesBinding) {
+                    ForEach(0...59, id: \.self) { m in
+                        Text("\(m)").tag(m)
+                    }
+                }
+                .pickerStyle(.wheel)
+                .frame(maxWidth: .infinity)
+                .clipped()
+                Text("min")
+                    .foregroundStyle(.secondary)
+            }
+            .frame(height: 130)
+        }
+    }
+
+    private var hoursBinding: Binding<Int> {
+        Binding(
+            get: { minutes / 60 },
+            set: { minutes = clamped($0 * 60 + minutes % 60) }
+        )
+    }
+
+    private var minutesBinding: Binding<Int> {
+        Binding(
+            get: { minutes % 60 },
+            set: { minutes = clamped((minutes / 60) * 60 + $0) }
+        )
+    }
+
+    private func clamped(_ value: Int) -> Int {
+        (!allowZero && value == 0) ? 1 : value
     }
 }
 
