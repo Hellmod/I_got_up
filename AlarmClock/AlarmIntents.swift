@@ -45,7 +45,7 @@ struct StopAlarmIntent: LiveActivityIntent {
         }
 
         // A fired snooze ring leaves bookkeeping behind — clear it.
-        AlarmKitManager.shared.cancelSnoozeRing(for: id)
+        await AlarmKitManager.shared.cancelSnoozeRing(for: id)
 
         // Stopping the alarm starts the wake-up verification cycle:
         // delay phase, response window, then an AlarmKit re-ring if no response.
@@ -99,7 +99,7 @@ struct SnoozeAlarmIntent: LiveActivityIntent {
 
         // Snoozing means the user is not up yet — any pending wake-up check is
         // stale; a fresh cycle starts when they eventually stop the alarm.
-        AlarmKitManager.shared.cancelWakeUpCheck(for: id)
+        await AlarmKitManager.shared.cancelWakeUpCheck(for: id)
 
         await AlarmKitManager.shared.scheduleSnoozeRing(for: alarm)
 

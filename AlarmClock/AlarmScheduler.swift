@@ -18,7 +18,7 @@ class AlarmScheduler {
     /// Disable an alarm: cancel the AlarmKit alarm and any pending wake-up check.
     func disable(_ alarm: Alarm) {
         AlarmKitManager.shared.cancel(alarm.id)
-        AlarmKitManager.shared.cancelWakeUpCheck(for: alarm.id)
+        Task { await AlarmKitManager.shared.cancelWakeUpCheck(for: alarm.id) }
     }
 
     /// Toggle alarm on/off and update the store.

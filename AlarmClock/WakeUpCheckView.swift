@@ -138,7 +138,7 @@ struct WakeUpCheckView: View {
 
     private func confirm() {
         historyStore.record(alarm: alarm, action: .wakeConfirmed)
-        alarmKit.cancelWakeUpCheck(for: alarm.id)
+        Task { await alarmKit.cancelWakeUpCheck(for: alarm.id) }
         alarmKit.pendingWakeUpAlarm = nil
     }
 

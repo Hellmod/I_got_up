@@ -117,9 +117,11 @@ final class AlarmKitManager: ObservableObject {
     }
 
     func cancel(_ alarmID: UUID) {
-        Task { try? await AlarmManager.shared.cancel(id: alarmID) }
-        cancelReRing(for: alarmID)
-        cancelSnoozeRing(for: alarmID)
+        Task {
+            try? await AlarmManager.shared.cancel(id: alarmID)
+            await cancelReRing(for: alarmID)
+            await cancelSnoozeRing(for: alarmID)
+        }
     }
 
     // MARK: - Snooze ring (swipe-proof)
@@ -129,7 +131,7 @@ final class AlarmKitManager: ObservableObject {
     /// cosmetic countdown activity.
     func scheduleSnoozeRing(for alarm: Alarm) async {
         guard await requestAuthorizationIfNeeded() else { return }
-        cancelSnoozeRing(for: alarm.id)
+        await cancelSnoozeRing(for: alarm.id)
 
         let ringDate = Date().addingTimeInterval(TimeInterval(alarm.snoozeDuration * 60))
         let title = alarm.label.isEmpty ? String(localized: "Alarm \(alarm.timeString)") : alarm.label
@@ -149,18 +151,18 @@ final class AlarmKitManager: ObservableObject {
         states.append(SnoozeState(alarmID: alarm.id, ringDate: ringDate))
         saveSnoozeStates(states)
 
-        startCountdownActivity(for: alarm, ringDate: ringDate,
-                               title: String(localized: "Snooze"))
+        await startCountdownActivity(for: alarm, ringDate: ringDate,
+                                     title: String(localized: "Snooze"))
         refreshActiveCycles()
     }
 
-    func cancelSnoozeRing(for alarmID: UUID) {
+    func cancelSnoozeRing(for alarmID: UUID) async {
         if let id = storedID(for: alarmID, in: snoozeMapKey) {
             removeID(for: alarmID, in: snoozeMapKey)
-            Task { try? await AlarmManager.shared.cancel(id: id) }
+            try? await AlarmManager.shared.cancel(id: id)
         }
         saveSnoozeStates(loadSnoozeStates().filter { $0.alarmID != alarmID })
-        endCountdownActivity(for: alarmID)
+        await endCountdownActivity(for: alarmID)
         refreshActiveCycles()
     }
 
@@ -182,7 +184,7 @@ final class AlarmKitManager: ObservableObject {
     /// to the Wake-Up Check notifications.
     func scheduleReRing(for alarm: Alarm, after seconds: TimeInterval) async {
         guard await requestAuthorizationIfNeeded() else { return }
-        cancelReRing(for: alarm.id)
+        await cancelReRing(for: alarm.id)
 
         let baseName = alarm.label.isEmpty ? String(localized: "Alarm") : alarm.label
         let title = String(localized: "\(baseName) — no response!")
@@ -205,24 +207,32 @@ final class AlarmKitManager: ObservableObject {
 
         // The visible countdown is our own cosmetic Live Activity — swiping it
         // away dismisses only the UI, never the alarm above.
-        startCountdownActivity(for: alarm, ringDate: ringDate,
-                               title: String(localized: "Time left to confirm you're up"))
+        await startCountdownActivity(for: alarm, ringDate: ringDate,
+                                     title: String(localized: "Time left to confirm you're up"))
     }
 
-    func cancelReRing(for alarmID: UUID) {
+    func cancelReRing(for alarmID: UUID) async {
         for mapKey in [reRingMapKey, backupMapKey] {
             if let id = storedID(for: alarmID, in: mapKey) {
                 removeID(for: alarmID, in: mapKey)
-                Task { try? await AlarmManager.shared.cancel(id: id) }
+                try? await AlarmManager.shared.cancel(id: id)
             }
         }
-        endCountdownActivity(for: alarmID)
+        await endCountdownActivity(for: alarmID)
     }
 
     // MARK: - Cosmetic countdown Live Activity
 
-    private func startCountdownActivity(for alarm: Alarm, ringDate: Date, title: String) {
-        endCountdownActivity(for: alarm.id)
+    /// Stale activities are ended (awaited) BEFORE the new one is requested.
+    /// Previously the ending ran in a detached Task that could fire *after*
+    /// Activity.request and immediately tear down the activity we just created —
+    /// which is why the countdown stopped appearing on the Lock Screen.
+    private func startCountdownActivity(for alarm: Alarm, ringDate: Date, title: String) async {
+        await endCountdownActivity(for: alarm.id)
+        guard ActivityAuthorizationInfo().areActivitiesEnabled else {
+            print("⚠️ Live Activities disabled for this app in Settings — countdown not shown")
+            return
+        }
         let attributes = WakeCheckActivityAttributes(
             alarmID: alarm.id.uuidString,
             title: title)
@@ -231,18 +241,16 @@ final class AlarmKitManager: ObservableObject {
             staleDate: ringDate.addingTimeInterval(60))
         do {
             _ = try Activity.request(attributes: attributes, content: content)
+            print("✅ Countdown activity started, ringing at \(ringDate)")
         } catch {
-            // Live Activities disabled — countdown invisible, alarm unaffected.
             print("⚠️ Countdown activity not shown: \(error)")
         }
     }
 
-    private func endCountdownActivity(for alarmID: UUID) {
-        Task {
-            for activity in Activity<WakeCheckActivityAttributes>.activities
-            where activity.attributes.alarmID == alarmID.uuidString {
-                await activity.end(nil, dismissalPolicy: .immediate)
-            }
+    private func endCountdownActivity(for alarmID: UUID) async {
+        for activity in Activity<WakeCheckActivityAttributes>.activities
+        where activity.attributes.alarmID == alarmID.uuidString {
+            await activity.end(nil, dismissalPolicy: .immediate)
         }
     }
 
@@ -270,9 +278,9 @@ final class AlarmKitManager: ObservableObject {
         await scheduleWakeCheck(for: alarm, delay: 0, response: 5 * 60)
     }
 
-    func cancelWakeUpCheck(for alarmID: UUID) {
+    func cancelWakeUpCheck(for alarmID: UUID) async {
         clearWakeCheckState(for: alarmID)
-        cancelReRing(for: alarmID)
+        await cancelReRing(for: alarmID)
         refreshActiveCycles()
     }
 
@@ -281,7 +289,7 @@ final class AlarmKitManager: ObservableObject {
     }
 
     private func scheduleWakeCheck(for alarm: Alarm, delay: TimeInterval, response: TimeInterval) async {
-        cancelWakeUpCheck(for: alarm.id)
+        await cancelWakeUpCheck(for: alarm.id)
         let now = Date()
         var states = loadWakeCheckStates()
         states.append(WakeCheckState(
@@ -327,8 +335,10 @@ final class AlarmKitManager: ObservableObject {
         // No-snooze alarms show only the Stop button on the system alarm screen.
         let alert: AlarmPresentation.Alert
         if alarm.snoozeEnabled {
+            // Show how long the snooze lasts right on the alarm screen's button,
+            // e.g. "Snooze 5 min" / "Drzemka 5 min".
             let snoozeButton = AlarmButton(
-                text: "Snooze",
+                text: "Snooze \(durationText(minutes: alarm.snoozeDuration))",
                 textColor: .white,
                 systemImageName: "moon.zzz.fill")
             alert = AlarmPresentation.Alert(
