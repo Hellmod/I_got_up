@@ -108,9 +108,9 @@ struct AddAlarmView: View {
                     Toggle("Snooze", isOn: $snoozeEnabled)
                     if snoozeEnabled {
                         Picker("Snooze duration", selection: $snoozeDuration) {
-                            Text("5 min").tag(5)
-                            Text("10 min").tag(10)
-                            Text("15 min").tag(15)
+                            ForEach(snoozeChoices, id: \.self) { minutes in
+                                Text(durationText(minutes: minutes)).tag(minutes)
+                            }
                         }
                     }
                 }
@@ -120,22 +120,22 @@ struct AddAlarmView: View {
                     Toggle("Wake-Up Check", isOn: $wakeUpCheckEnabled)
 
                     if wakeUpCheckEnabled {
-                        Stepper(
-                            "Delay: \(wakeUpCheckDelay) min",
-                            value: $wakeUpCheckDelay,
-                            in: 0...10
-                        )
-                        Stepper(
-                            "Re-ring after no response: \(wakeUpNoResponseTime) min",
-                            value: $wakeUpNoResponseTime,
-                            in: 1...15
-                        )
+                        Picker("Delay", selection: $wakeUpCheckDelay) {
+                            ForEach(delayChoices, id: \.self) { minutes in
+                                Text(durationText(minutes: minutes)).tag(minutes)
+                            }
+                        }
+                        Picker("Re-ring after no response", selection: $wakeUpNoResponseTime) {
+                            ForEach(noResponseChoices, id: \.self) { minutes in
+                                Text(durationText(minutes: minutes)).tag(minutes)
+                            }
+                        }
                     }
                 } header: {
                     Text("Wake-up verification")
                 } footer: {
                     if wakeUpCheckEnabled {
-                        Text("After stopping the alarm, a \(wakeUpCheckDelay) min delay starts during which you can't confirm yet. Then you have \(wakeUpNoResponseTime) min to confirm you're up — otherwise the alarm rings again.")
+                        Text("After stopping the alarm, a \(durationText(minutes: wakeUpCheckDelay)) delay starts during which you can't confirm yet. Then you have \(durationText(minutes: wakeUpNoResponseTime)) to confirm you're up — otherwise the alarm rings again.")
                     }
                 }
             }
@@ -157,6 +157,22 @@ struct AddAlarmView: View {
     }
 
     // MARK: - Helpers
+
+    // Long durations welcome — e.g. a 2 h snooze or a 30 min confirmation
+    // window. The current value is kept selectable even if it's not on the
+    // standard list (alarms saved by other app versions).
+    private var snoozeChoices: [Int] { choices([1, 5, 10, 15, 20, 30, 45, 60, 90, 120], current: snoozeDuration) }
+    private var delayChoices: [Int] { choices([0, 1, 2, 3, 5, 10, 15, 20, 30, 45, 60, 90, 120], current: wakeUpCheckDelay) }
+    private var noResponseChoices: [Int] { choices([1, 2, 3, 5, 10, 15, 20, 30, 45, 60, 90, 120], current: wakeUpNoResponseTime) }
+
+    private func choices(_ base: [Int], current: Int) -> [Int] {
+        var values = base
+        if !values.contains(current) {
+            values.append(current)
+            values.sort()
+        }
+        return values
+    }
 
     private var isOnce: Bool {
         if case .once = repeatSchedule { return true }

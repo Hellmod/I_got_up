@@ -128,6 +128,16 @@ extension Alarm {
     }
 }
 
+/// "35 min", "1 h", "1 h 30 min" — shared duration formatting for pickers.
+func durationText(minutes: Int) -> String {
+    if minutes >= 60 {
+        let h = minutes / 60
+        let m = minutes % 60
+        return m == 0 ? String(localized: "\(h) h") : String(localized: "\(h) h \(m) min")
+    }
+    return String(localized: "\(minutes) min")
+}
+
 // MARK: - AlarmStore
 
 class AlarmStore: ObservableObject {
