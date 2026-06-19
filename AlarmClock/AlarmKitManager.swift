@@ -126,23 +126,28 @@ final class AlarmKitManager: ObservableObject {
 
     // MARK: - Snooze ring (swipe-proof)
 
-    /// Replaces the system snooze countdown: stops nothing by itself — just
-    /// schedules a fixed-date alarm (no swipeable Live Activity) plus our own
-    /// cosmetic countdown activity.
+    /// Schedules the snooze re-ring as its own AlarmKit countdown timer. Because
+    /// it's a separate id (not the main alarm transitioned to countdown), the
+    /// system-rendered countdown — visible on the Lock Screen even when locked —
+    /// and any swipe-to-cancel only affect the snooze, never the repeating alarm.
     func scheduleSnoozeRing(for alarm: Alarm) async {
         guard await requestAuthorizationIfNeeded() else { return }
         await cancelSnoozeRing(for: alarm.id)
 
-        let ringDate = Date().addingTimeInterval(TimeInterval(alarm.snoozeDuration * 60))
+        let snoozeSeconds = TimeInterval(alarm.snoozeDuration * 60)
+        let ringDate = Date().addingTimeInterval(snoozeSeconds)
         let title = alarm.label.isEmpty ? String(localized: "Alarm \(alarm.timeString)") : alarm.label
 
+        // schedule: nil + countdownPreAlert → a system countdown timer that the
+        // OS draws and re-rings on its own, reliably, even from the Lock Screen.
         let snoozeID = UUID()
         saveID(snoozeID, for: alarm.id, in: snoozeMapKey)
-        let config = makeConfiguration(for: alarm, schedule: .fixed(ringDate),
-                                       firingID: snoozeID, title: title)
+        let config = makeConfiguration(for: alarm, schedule: nil,
+                                       firingID: snoozeID, title: title,
+                                       countdownPreAlert: snoozeSeconds)
         do {
             _ = try await AlarmManager.shared.schedule(id: snoozeID, configuration: config)
-            print("✅ AlarmKit snooze ring in \(alarm.snoozeDuration)min [\(snoozeID)]")
+            print("✅ AlarmKit snooze countdown \(alarm.snoozeDuration)min [\(snoozeID)]")
         } catch {
             print("❌ AlarmKit snooze ring failed: \(error)")
         }
@@ -150,9 +155,6 @@ final class AlarmKitManager: ObservableObject {
         var states = loadSnoozeStates().filter { $0.alarmID != alarm.id }
         states.append(SnoozeState(alarmID: alarm.id, ringDate: ringDate))
         saveSnoozeStates(states)
-
-        await startCountdownActivity(for: alarm, ringDate: ringDate,
-                                     title: String(localized: "Snooze"))
         refreshActiveCycles()
     }
 
@@ -321,11 +323,18 @@ final class AlarmKitManager: ObservableObject {
 
     // Note: our own `Alarm` model shadows AlarmKit's `Alarm` type, so AlarmKit's
     // nested types must be written fully qualified (AlarmKit.Alarm.…).
+    //
+    // `countdownPreAlert` (seconds) turns the config into a system countdown
+    // timer: scheduled with `schedule: nil`, the OS renders a ticking countdown
+    // (Lock Screen / Dynamic Island) and alerts when it reaches zero. Only the
+    // snooze ring uses it — the main alarm and the swipe-proof wake-up re-ring
+    // pass nil and carry no system countdown.
     private func makeConfiguration(
         for alarm: Alarm,
         schedule: AlarmKit.Alarm.Schedule?,
         firingID: UUID,
-        title: String
+        title: String,
+        countdownPreAlert: TimeInterval? = nil
     ) -> AlarmManager.AlarmConfiguration<EmptyMetadata> {
         let stopButton = AlarmButton(
             text: "Stop",
@@ -352,15 +361,25 @@ final class AlarmKitManager: ObservableObject {
                 stopButton: stopButton)
         }
 
+        let presentation: AlarmPresentation
+        let countdownDuration: AlarmKit.Alarm.CountdownDuration?
+        if let preAlert = countdownPreAlert {
+            let countdown = AlarmPresentation.Countdown(
+                title: LocalizedStringResource(stringLiteral: title),
+                pauseButton: nil)
+            presentation = AlarmPresentation(alert: alert, countdown: countdown)
+            countdownDuration = AlarmKit.Alarm.CountdownDuration(preAlert: preAlert, postAlert: nil)
+        } else {
+            presentation = AlarmPresentation(alert: alert)
+            countdownDuration = nil
+        }
+
         let attributes = AlarmAttributes<EmptyMetadata>(
-            presentation: AlarmPresentation(alert: alert),
+            presentation: presentation,
             tintColor: .orange)
 
-        // countdownDuration stays nil everywhere: snooze re-fires through our
-        // own fixed-date alarm (swipe-proof), so the system countdown — whose
-        // Live Activity can be swiped away to cancel it — is never used.
         return AlarmManager.AlarmConfiguration(
-            countdownDuration: nil,
+            countdownDuration: countdownDuration,
             schedule: schedule,
             attributes: attributes,
             stopIntent: StopAlarmIntent(alarmID: alarm.id.uuidString,

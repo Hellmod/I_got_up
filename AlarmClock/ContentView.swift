@@ -190,6 +190,26 @@ struct ContentView: View {
                 .fontWeight(.semibold)
                 .monospacedDigit()
                 .foregroundStyle(.indigo)
+                .frame(minWidth: 0)
+            // Tap to call off the snooze — the pending re-ring is cancelled so
+            // the alarm won't go off again.
+            Button {
+                Task { await alarmKit.cancelSnoozeRing(for: state.alarmID) }
+            } label: {
+                Image(systemName: "stop.circle.fill")
+                    .font(.title2)
+                    .foregroundStyle(.red)
+            }
+            .buttonStyle(.borderless)
+            .accessibilityLabel(Text("Stop"))
+        }
+        // Whole row is also swipeable to cancel, matching the alarm-list rows.
+        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+            Button(role: .destructive) {
+                Task { await alarmKit.cancelSnoozeRing(for: state.alarmID) }
+            } label: {
+                Label("Stop", systemImage: "stop.circle")
+            }
         }
     }
 
