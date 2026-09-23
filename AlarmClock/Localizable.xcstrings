@@ -6703,6 +6703,201 @@
           }
         }
       }
+    },
+    "Snooze with a countdown" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "غفوة مع عدّ تنازلي"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schlummern mit Countdown"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Posponer con cuenta atrás"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rappel avec compte à rebours"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "काउंटडाउन के साथ स्नूज़"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カウントダウン付きスヌーズ"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drzemka z odliczaniem"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Soneca com contagem regressiva"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отложить с таймером"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "带倒计时的贪睡"
+          }
+        }
+      }
+    },
+    "Tap snooze and a live countdown on the Lock Screen shows when the alarm will ring again." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اضغط على الغفوة وسيظهر عدّ تنازلي مباشر على شاشة القفل يوضّح موعد رنين المنبّه مجدداً."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tippe auf Schlummern und ein Live-Countdown im Sperrbildschirm zeigt, wann der Wecker erneut klingelt."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toca posponer y una cuenta atrás en directo en la pantalla de bloqueo muestra cuándo volverá a sonar la alarma."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touchez rappel et un compte à rebours en direct sur l'écran verrouillé indique quand l'alarme sonnera à nouveau."
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "स्नूज़ दबाएँ और लॉक स्क्रीन पर लाइव काउंटडाउन दिखाएगा कि अलार्म दोबारा कब बजेगा।"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スヌーズをタップすると、ロック画面のライブカウントダウンにアラームが再び鳴る時刻が表示されます。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Naciśnij drzemkę, a licznik na żywo na ekranie blokady pokaże, kiedy alarm zadzwoni ponownie."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toque em soneca e uma contagem regressiva ao vivo na tela de bloqueio mostra quando o alarme tocará de novo."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нажмите «Отложить», и таймер на экране блокировки покажет, когда будильник зазвонит снова."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "点按贪睡，锁定屏幕上的实时倒计时会显示闹钟何时再次响起。"
+          }
+        }
+      }
+    },
+    "If you don't confirm in time, a real alarm rings again — and swiping the countdown away won't stop it. 😈" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إذا لم تؤكّد في الوقت المناسب، سيرنّ منبّه حقيقي من جديد — وإزالة العدّ التنازلي بالسحب لن توقفه. 😈"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn du nicht rechtzeitig bestätigst, klingelt ein echter Wecker erneut – und den Countdown wegzuwischen stoppt ihn nicht. 😈"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si no confirmas a tiempo, una alarma real vuelve a sonar, y deslizar la cuenta atrás no la detendrá. 😈"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si vous ne confirmez pas à temps, une vraie alarme sonne à nouveau — et balayer le compte à rebours ne l'arrêtera pas. 😈"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "अगर आपने समय पर पुष्टि नहीं की, तो असली अलार्म फिर से बजेगा — और काउंटडाउन को स्वाइप करके हटाने से वह नहीं रुकेगा। 😈"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "時間内に確認しないと、本物のアラームがまた鳴ります。カウントダウンをスワイプで消しても止まりません。😈"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jeśli nie potwierdzisz na czas, prawdziwy alarm zadzwoni ponownie — a zmiotnięcie licznika go nie zatrzyma. 😈"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se você não confirmar a tempo, um alarme real toca de novo — e arrastar a contagem regressiva não vai pará-lo. 😈"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Если не подтвердить вовремя, настоящий будильник зазвонит снова — и смахивание таймера его не остановит. 😈"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "如果没有及时确认，真正的闹钟会再次响起——把倒计时划走也无法阻止它。😈"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

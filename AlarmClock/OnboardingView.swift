@@ -31,6 +31,9 @@ struct OnboardingView: View {
                         featureRow(icon: "alarm.fill", color: .orange,
                                    title: "A real alarm",
                                    text: "Rings full-screen even when the app is closed and breaks through silent mode.")
+                        featureRow(icon: "moon.zzz.fill", color: .indigo,
+                                   title: "Snooze with a countdown",
+                                   text: "Tap snooze and a live countdown on the Lock Screen shows when the alarm will ring again.")
                         featureRow(icon: "checkmark.circle.fill", color: .green,
                                    title: "Wake-Up Check",
                                    text: "After you stop the alarm, it asks whether you actually got up.")
@@ -39,7 +42,7 @@ struct OnboardingView: View {
                                    text: "A countdown on the Lock Screen shows how much time is left to confirm.")
                         featureRow(icon: "bell.and.waves.left.and.right.fill", color: .red,
                                    title: "No response? It rings again",
-                                   text: "If you don't confirm in time, a real alarm rings again. No mercy. 😈")
+                                   text: "If you don't confirm in time, a real alarm rings again — and swiping the countdown away won't stop it. 😈")
                     }
                     .padding(.horizontal, 28)
                 }
