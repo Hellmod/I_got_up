@@ -9,6 +9,8 @@
 - ✅ `ITSAppUsesNonExemptEncryption = false` — pomija pytanie o eksport szyfrowania przy każdym uploadzie
 - ✅ `NSAlarmKitUsageDescription` — opis uprawnień do alarmów
 - ✅ Minimalny system: iOS 26.0 (wymóg AlarmKit)
+- ✅ Lokalizacja: 20 języków (język wybierany automatycznie z systemu) — pl, en, de, es, fr, pt-BR, ru, ja, zh-Hans, zh-Hant, ar, hi, it, nl, sv, tr, uk, id, ko, vi, th
+- ⚠️ Tłumaczenia 10 nowszych języków (it, nl, sv, tr, uk, id, ko, vi, th, zh-Hant) to pierwsze podejście AI — zalecany przegląd native speakera przed finalną publikacją
 
 ## Kroki w App Store Connect (do zrobienia ręcznie)
 
@@ -42,11 +44,11 @@
 >
 > **Funkcje:**
 > • Prawdziwe alarmy systemowe (AlarmKit) — działają nawet gdy aplikacja jest zamknięta
-> • Wake-Up Check — konfigurowalne opóźnienie i czas na odpowiedź
-> • Drzemka wprost z ekranu alarmu (5/10/15 min)
+> • Wake-Up Check — konfigurowalne opóźnienie i czas na odpowiedź; po wyłączeniu alarmu odliczanie do ponownego dzwonka widać na ekranie blokady, a zmiotnięcie go nie zatrzyma
+> • Drzemka o dowolnej długości — z odliczaniem widocznym na ekranie blokady
 > • Powtarzanie w wybrane dni tygodnia
 > • Historia: kiedy wyłączyłeś, ile drzemek, kiedy potwierdziłeś wstanie
-> • Odliczanie do następnego alarmu przy każdej pozycji listy
+> • 20 języków — aplikacja sama dopasowuje się do języka systemu
 > • Zero reklam, zero śledzenia, zero kont — wszystko zostaje na Twoim telefonie
 
 ### Słowa kluczowe (100 znaków)
@@ -57,12 +59,43 @@
 
 ### App Review Notes (EN)
 > The app uses the AlarmKit framework (iOS 26+) to schedule real system
-> alarms. On first launch it asks for the Alarms permission and the
-> Notifications permission (used only for the "wake-up check" follow-up
-> reminders). To test: add an alarm 1–2 minutes ahead, lock the device,
-> wait for the full-screen alarm. After stopping it, a "did you wake up?"
-> notification arrives after the configured delay; ignoring it re-rings
-> a real alarm. No account, no network calls, all data stored locally.
+> alarms. On first launch it asks for the Alarms permission only (no
+> notifications are used). To test: add an alarm 1–2 minutes ahead, lock the
+> device, wait for the full-screen alarm. After stopping it, a "Wake-Up
+> Check" countdown starts, shown on the Lock Screen and in-app; if you don't
+> confirm you're up in time, a real alarm rings again. Swiping the countdown
+> away does not cancel it — an offset backup alarm guarantees the re-ring.
+> No account, no network calls, all data stored locally.
+
+## Store copy (EN — for the primary English listing)
+
+### Subtitle (30 chars)
+> The alarm that checks you woke
+
+### Description (EN)
+> **Wstałem! ("I'm up!") is the alarm you can't cheat.**
+>
+> Any alarm can be switched off in your sleep. Wstałem! is the one that, after you stop it, asks whether you REALLY got up — and if you don't answer, it rings again. With a real, loud, full-screen system alarm, not a quiet notification.
+>
+> **How it works:**
+> 1. The alarm rings like the built-in Clock — full screen, cutting through silent mode
+> 2. After you stop it, a few minutes later you're asked: "Are you up yet?"
+> 3. No response = the alarm rings again. No mercy. 😈
+>
+> **Features:**
+> • Real system alarms (AlarmKit) — work even when the app is closed
+> • Wake-Up Check — configurable delay and response time; after you stop the alarm the countdown to the re-ring shows on the Lock Screen, and swiping it away won't stop it
+> • Snooze of any length — with a live Lock Screen countdown
+> • Repeat on chosen weekdays
+> • History: when you stopped it, how many snoozes, when you confirmed you were up
+> • 20 languages — the app follows your system language
+> • No ads, no tracking, no accounts — everything stays on your phone
+
+### Keywords (100 chars)
+> alarm,wake up,wakeup,morning,snooze,sleep,oversleep,heavy sleeper,confirm,alarm clock,get up
+
+### Promotional text (170 chars)
+> The only alarm that checks you actually got up. Don't answer and it rings again. Built for heavy sleepers and snooze addicts.
 
 ## Nazwa — uzasadnienie i warianty
 
