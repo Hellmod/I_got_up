@@ -225,6 +225,16 @@
 				"zh-Hans",
 				ar,
 				hi,
+				it,
+				nl,
+				sv,
+				tr,
+				uk,
+				id,
+				ko,
+				vi,
+				th,
+				"zh-Hant",
 				Base,
 			);
 			mainGroup = B300000000000000DEADBEEF;
