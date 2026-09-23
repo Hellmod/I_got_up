@@ -16,7 +16,7 @@ struct OnboardingView: View {
                         Image(systemName: "alarm.waves.left.and.right.fill")
                             .font(.system(size: 56))
                             .foregroundStyle(.orange)
-                        Text(verbatim: "Wstałem!")
+                        Text("I Wake Up")
                             .font(.largeTitle)
                             .fontWeight(.bold)
                         Text("The alarm that checks you're really up")

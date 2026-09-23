@@ -3,12 +3,12 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDisplayName</key>
-	<string>Wstałem!</string>
+	<string>I Wake Up</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>NSSupportsLiveActivities</key>
 	<true/>
 	<key>NSAlarmKitUsageDescription</key>
-	<string>Aplikacja potrzebuje uprawnień do alarmów, aby budzik mógł dzwonić o ustawionej godzinie.</string>
+	<string>The app needs alarm permission so the alarm clock can ring at the scheduled time.</string>
 </dict>
 </plist>
