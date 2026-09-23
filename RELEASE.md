@@ -9,6 +9,8 @@
 - ✅ `ITSAppUsesNonExemptEncryption = false` — pomija pytanie o eksport szyfrowania przy każdym uploadzie
 - ✅ `NSAlarmKitUsageDescription` — opis uprawnień do alarmów
 - ✅ Minimalny system: iOS 26.0 (wymóg AlarmKit)
+- ✅ Tylko iPhone (`TARGETED_DEVICE_FAMILY = 1`) — brak wymogu zrzutów iPada
+- ✅ Zrzuty ekranu 6,9″ (1320×2868) gotowe: `AppStore_Screenshots/` → `en/` i `pl/` (onboarding, lista alarmów, „Czy już wstałeś?")
 - ✅ Lokalizacja: 20 języków (język wybierany automatycznie z systemu) — pl, en, de, es, fr, pt-BR, ru, ja, zh-Hans, zh-Hant, ar, hi, it, nl, sv, tr, uk, id, ko, vi, th
 - ⚠️ Tłumaczenia 10 nowszych języków (it, nl, sv, tr, uk, id, ko, vi, th, zh-Hant) to pierwsze podejście AI — zalecany przegląd native speakera przed finalną publikacją
 
@@ -18,7 +20,7 @@
    - Platform: iOS · Name: **Wstałem!** · Język główny: Polski
    - Bundle ID: `com.4lcah5j7v4.AlarmClock` · SKU: np. `wstalem-001`
 2. **Archiwizacja**: Xcode → wybierz urządzenie **Any iOS Device (arm64)** → Product → **Archive** → Organizer → **Distribute App** → App Store Connect
-3. **Zrzuty ekranu** (wymagane): iPhone 6,9″ (np. 16 Pro Max) — lista alarmów, ekran dodawania, systemowy ekran alarmu, ekran „Czy już wstałeś?", historia
+3. **Zrzuty ekranu**: gotowe w `AppStore_Screenshots/` (slot iPhone 6,9″), osobno `en/` i `pl/` — wgraj je w App Store Connect. Tylko iPhone, więc **iPad NIE jest potrzebny**.
 4. **Prywatność aplikacji**: sekcja App Privacy → **Data Not Collected** (wszystkie dane trzymane lokalnie w UserDefaults, zero sieci, zero analityki)
 5. **Kategoria**: Lifestyle (ew. Utilities) · **Ocena wiekowa**: 4+
 6. **Uwagi dla recenzenta** (App Review Notes): patrz niżej
