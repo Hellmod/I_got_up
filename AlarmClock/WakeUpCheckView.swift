@@ -43,6 +43,10 @@ struct WakeUpCheckView: View {
             }
             .padding(.top, 12)
         }
+        // Always dark, even when the system (and the rest of the app) is in
+        // light mode — a dark wake-up screen is easier on half-asleep eyes and
+        // keeps the white text / status bar legible on the black background.
+        .preferredColorScheme(.dark)
     }
 
     // MARK: - Phases
